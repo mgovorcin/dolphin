@@ -1,0 +1,2285 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      <link rel="icon" href="../../../../img/favicon.ico">
+      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-8.5.10">
+    
+    
+      
+        <title>config - Documentation for dolphin</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../../assets/stylesheets/main.472b142f.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../../assets/stylesheets/palette.08040f6c.min.css">
+        
+          
+          
+          <meta name="theme-color" content="#00bdd6">
+        
+      
+      
+
+    
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../../../assets/_mkdocstrings.css">
+    
+    <script>__md_scope=new URL("../../../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="cyan" data-md-color-accent="">
+  
+    
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#dolphin.workflows.config" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <div data-md-component="outdated" hidden>
+        
+      </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../../.." title="Documentation for dolphin" class="md-header__button md-logo" aria-label="Documentation for dolphin" data-md-component="logo">
+      
+  <img src="../../../../img/apple-touch-icon.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Documentation for dolphin
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              config
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../../.." title="Documentation for dolphin" class="md-nav__button md-logo" aria-label="Documentation for dolphin" data-md-component="logo">
+      
+  <img src="../../../../img/apple-touch-icon.png" alt="logo">
+
+    </a>
+    Documentation for dolphin
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../.." class="md-nav__link">
+        Dolphin Documentation
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../getting-started/" class="md-nav__link">
+        Getting started
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../tutorials/" class="md-nav__link">
+        Tutorials
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../how-to-guides/" class="md-nav__link">
+        How to guides
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5" type="checkbox" id="__nav_5" checked>
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_5">
+          Code Reference
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Code Reference" data-md-level="1">
+        <label class="md-nav__title" for="__nav_5">
+          <span class="md-nav__icon md-icon"></span>
+          Code Reference
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+    
+  
+  
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_1" type="checkbox" id="__nav_5_1" checked>
+      
+      
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../">dolphin</a>
+          
+            <label for="__nav_5_1">
+              <span class="md-nav__icon md-icon"></span>
+            </label>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="dolphin" data-md-level="2">
+        <label class="md-nav__title" for="__nav_5_1">
+          <span class="md-nav__icon md-icon"></span>
+          dolphin
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../_log/" class="md-nav__link">
+        _log
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../_show_versions/" class="md-nav__link">
+        _show_versions
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../_version/" class="md-nav__link">
+        _version
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cli/" class="md-nav__link">
+        cli
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../utils/" class="md-nav__link">
+        utils
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+    
+  
+  
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_1_6" type="checkbox" id="__nav_5_1_6" checked>
+      
+      
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../">workflows</a>
+          
+            <label for="__nav_5_1_6">
+              <span class="md-nav__icon md-icon"></span>
+            </label>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="workflows" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_1_6">
+          <span class="md-nav__icon md-icon"></span>
+          workflows
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../_config_cli/" class="md-nav__link">
+        _config_cli
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../_enums/" class="md-nav__link">
+        _enums
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../_run_cli/" class="md-nav__link">
+        _run_cli
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          config
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        config
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#dolphin.workflows.config" class="md-nav__link">
+    dolphin.workflows.config
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dolphin.workflows.config.Config" class="md-nav__link">
+    Config
+  </a>
+  
+    <nav class="md-nav" aria-label="Config">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#dolphin.workflows.config.Config.from_yaml" class="md-nav__link">
+    from_yaml()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dolphin.workflows.config.Config.to_yaml" class="md-nav__link">
+    to_yaml()
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dolphin.workflows.config.HalfWindow" class="md-nav__link">
+    HalfWindow
+  </a>
+  
+    <nav class="md-nav" aria-label="HalfWindow">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#dolphin.workflows.config.HalfWindow.from_looks" class="md-nav__link">
+    from_looks()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dolphin.workflows.config.HalfWindow.to_looks" class="md-nav__link">
+    to_looks()
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dolphin.workflows.config.Inputs" class="md-nav__link">
+    Inputs
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dolphin.workflows.config.InterferogramNetwork" class="md-nav__link">
+    InterferogramNetwork
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dolphin.workflows.config.Outputs" class="md-nav__link">
+    Outputs
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dolphin.workflows.config.PhaseLinkingOptions" class="md-nav__link">
+    PhaseLinkingOptions
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dolphin.workflows.config.PsOptions" class="md-nav__link">
+    PsOptions
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dolphin.workflows.config.UnwrapOptions" class="md-nav__link">
+    UnwrapOptions
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dolphin.workflows.config.WorkerSettings" class="md-nav__link">
+    WorkerSettings
+  </a>
+  
+    <nav class="md-nav" aria-label="WorkerSettings">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#dolphin.workflows.config.WorkerSettings.Config" class="md-nav__link">
+    Config
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../s1_disp_stack/" class="md-nav__link">
+        s1_disp_stack
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../background-theory/" class="md-nav__link">
+        Background theory
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#dolphin.workflows.config" class="md-nav__link">
+    dolphin.workflows.config
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dolphin.workflows.config.Config" class="md-nav__link">
+    Config
+  </a>
+  
+    <nav class="md-nav" aria-label="Config">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#dolphin.workflows.config.Config.from_yaml" class="md-nav__link">
+    from_yaml()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dolphin.workflows.config.Config.to_yaml" class="md-nav__link">
+    to_yaml()
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dolphin.workflows.config.HalfWindow" class="md-nav__link">
+    HalfWindow
+  </a>
+  
+    <nav class="md-nav" aria-label="HalfWindow">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#dolphin.workflows.config.HalfWindow.from_looks" class="md-nav__link">
+    from_looks()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dolphin.workflows.config.HalfWindow.to_looks" class="md-nav__link">
+    to_looks()
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dolphin.workflows.config.Inputs" class="md-nav__link">
+    Inputs
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dolphin.workflows.config.InterferogramNetwork" class="md-nav__link">
+    InterferogramNetwork
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dolphin.workflows.config.Outputs" class="md-nav__link">
+    Outputs
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dolphin.workflows.config.PhaseLinkingOptions" class="md-nav__link">
+    PhaseLinkingOptions
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dolphin.workflows.config.PsOptions" class="md-nav__link">
+    PsOptions
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dolphin.workflows.config.UnwrapOptions" class="md-nav__link">
+    UnwrapOptions
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dolphin.workflows.config.WorkerSettings" class="md-nav__link">
+    WorkerSettings
+  </a>
+  
+    <nav class="md-nav" aria-label="WorkerSettings">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#dolphin.workflows.config.WorkerSettings.Config" class="md-nav__link">
+    Config
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  <h1>config</h1>
+
+<div class="doc doc-object doc-module">
+
+
+<a id="dolphin.workflows.config"></a>
+  <div class="doc doc-contents first">
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="dolphin.workflows.config.Config" class="doc doc-heading">
+        <code>Config</code>
+
+
+</h2>
+
+
+  <div class="doc doc-contents ">
+      <p class="doc doc-class-bases">
+        Bases: <code><span title="pydantic.BaseModel">BaseModel</span></code></p>
+
+  
+      <p>Configuration for the workflow.</p>
+<p>Required fields are in <code>Inputs</code>.
+Must specify either <code>cslc_file_list</code>, or <code>cslc_directory</code> and
+a <code>cslc_file_ext</code>.</p>
+
+
+        <details class="quote">
+          <summary>Source code in <code>dolphin/workflows/config.py</code></summary>
+          <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">291</span>
+<span class="normal">292</span>
+<span class="normal">293</span>
+<span class="normal">294</span>
+<span class="normal">295</span>
+<span class="normal">296</span>
+<span class="normal">297</span>
+<span class="normal">298</span>
+<span class="normal">299</span>
+<span class="normal">300</span>
+<span class="normal">301</span>
+<span class="normal">302</span>
+<span class="normal">303</span>
+<span class="normal">304</span>
+<span class="normal">305</span>
+<span class="normal">306</span>
+<span class="normal">307</span>
+<span class="normal">308</span>
+<span class="normal">309</span>
+<span class="normal">310</span>
+<span class="normal">311</span>
+<span class="normal">312</span>
+<span class="normal">313</span>
+<span class="normal">314</span>
+<span class="normal">315</span>
+<span class="normal">316</span>
+<span class="normal">317</span>
+<span class="normal">318</span>
+<span class="normal">319</span>
+<span class="normal">320</span>
+<span class="normal">321</span>
+<span class="normal">322</span>
+<span class="normal">323</span>
+<span class="normal">324</span>
+<span class="normal">325</span>
+<span class="normal">326</span>
+<span class="normal">327</span>
+<span class="normal">328</span>
+<span class="normal">329</span>
+<span class="normal">330</span>
+<span class="normal">331</span>
+<span class="normal">332</span>
+<span class="normal">333</span>
+<span class="normal">334</span>
+<span class="normal">335</span>
+<span class="normal">336</span>
+<span class="normal">337</span>
+<span class="normal">338</span>
+<span class="normal">339</span>
+<span class="normal">340</span>
+<span class="normal">341</span>
+<span class="normal">342</span>
+<span class="normal">343</span>
+<span class="normal">344</span>
+<span class="normal">345</span>
+<span class="normal">346</span>
+<span class="normal">347</span>
+<span class="normal">348</span>
+<span class="normal">349</span>
+<span class="normal">350</span>
+<span class="normal">351</span>
+<span class="normal">352</span>
+<span class="normal">353</span>
+<span class="normal">354</span>
+<span class="normal">355</span>
+<span class="normal">356</span>
+<span class="normal">357</span>
+<span class="normal">358</span>
+<span class="normal">359</span>
+<span class="normal">360</span>
+<span class="normal">361</span>
+<span class="normal">362</span>
+<span class="normal">363</span>
+<span class="normal">364</span>
+<span class="normal">365</span>
+<span class="normal">366</span>
+<span class="normal">367</span>
+<span class="normal">368</span>
+<span class="normal">369</span>
+<span class="normal">370</span>
+<span class="normal">371</span>
+<span class="normal">372</span>
+<span class="normal">373</span>
+<span class="normal">374</span>
+<span class="normal">375</span>
+<span class="normal">376</span>
+<span class="normal">377</span>
+<span class="normal">378</span>
+<span class="normal">379</span>
+<span class="normal">380</span>
+<span class="normal">381</span>
+<span class="normal">382</span>
+<span class="normal">383</span>
+<span class="normal">384</span>
+<span class="normal">385</span>
+<span class="normal">386</span>
+<span class="normal">387</span>
+<span class="normal">388</span>
+<span class="normal">389</span>
+<span class="normal">390</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">Config</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Configuration for the workflow.</span>
+
+<span class="sd">    Required fields are in `Inputs`.</span>
+<span class="sd">    Must specify either `cslc_file_list`, or `cslc_directory` and</span>
+<span class="sd">    a `cslc_file_ext`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">workflow_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">WorkflowName</span><span class="o">.</span><span class="n">STACK</span>
+
+    <span class="n">inputs</span><span class="p">:</span> <span class="n">Inputs</span>
+    <span class="n">outputs</span><span class="p">:</span> <span class="n">Outputs</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">Outputs</span><span class="p">)</span>
+
+    <span class="c1"># Options for each step in the workflow</span>
+    <span class="n">ps_options</span><span class="p">:</span> <span class="n">PsOptions</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">PsOptions</span><span class="p">)</span>
+    <span class="n">phase_linking</span><span class="p">:</span> <span class="n">PhaseLinkingOptions</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">PhaseLinkingOptions</span><span class="p">)</span>
+    <span class="n">interferogram_network</span><span class="p">:</span> <span class="n">InterferogramNetwork</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="n">InterferogramNetwork</span>
+    <span class="p">)</span>
+    <span class="n">unwrap_options</span><span class="p">:</span> <span class="n">UnwrapOptions</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">UnwrapOptions</span><span class="p">)</span>
+
+    <span class="c1"># General workflow metadata</span>
+    <span class="n">worker_settings</span><span class="p">:</span> <span class="n">WorkerSettings</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">WorkerSettings</span><span class="p">)</span>
+    <span class="n">creation_time_utc</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">)</span>
+    <span class="n">dolphin_version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">_dolphin_version</span>
+
+    <span class="c1"># validators</span>
+    <span class="nd">@root_validator</span>
+    <span class="k">def</span> <span class="nf">_move_dirs_inside_scratch</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Ensure outputs from workflow steps are within scratch directory.&quot;&quot;&quot;</span>
+        <span class="n">scratch_dir</span> <span class="o">=</span> <span class="n">values</span><span class="p">[</span><span class="s2">&quot;outputs&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">scratch_directory</span>
+
+        <span class="c1"># For each workflow step that has an output folder, move it inside</span>
+        <span class="c1"># the scratch directory (if it&#39;s not already inside).</span>
+        <span class="c1"># They may already be inside if we&#39;re loading from a json/yaml file.</span>
+        <span class="n">ps_opts</span> <span class="o">=</span> <span class="n">values</span><span class="p">[</span><span class="s2">&quot;ps_options&quot;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">ps_opts</span><span class="o">.</span><span class="n">directory</span><span class="o">.</span><span class="n">parent</span> <span class="o">==</span> <span class="n">scratch_dir</span><span class="p">:</span>
+            <span class="n">values</span><span class="p">[</span><span class="s2">&quot;ps_options&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">directory</span> <span class="o">=</span> <span class="n">scratch_dir</span> <span class="o">/</span> <span class="n">ps_opts</span><span class="o">.</span><span class="n">directory</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">ps_opts</span><span class="o">.</span><span class="n">amp_dispersion_file</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">parent</span> <span class="o">==</span> <span class="n">scratch_dir</span><span class="p">:</span>
+            <span class="n">values</span><span class="p">[</span><span class="s2">&quot;ps_options&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">amp_dispersion_file</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">scratch_dir</span> <span class="o">/</span> <span class="n">ps_opts</span><span class="o">.</span><span class="n">amp_dispersion_file</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">ps_opts</span><span class="o">.</span><span class="n">amp_mean_file</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">parent</span> <span class="o">==</span> <span class="n">scratch_dir</span><span class="p">:</span>
+            <span class="n">values</span><span class="p">[</span><span class="s2">&quot;ps_options&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">amp_mean_file</span> <span class="o">=</span> <span class="n">scratch_dir</span> <span class="o">/</span> <span class="n">ps_opts</span><span class="o">.</span><span class="n">amp_mean_file</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">ps_opts</span><span class="o">.</span><span class="n">output_file</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">parent</span> <span class="o">==</span> <span class="n">scratch_dir</span><span class="p">:</span>
+            <span class="n">values</span><span class="p">[</span><span class="s2">&quot;ps_options&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">output_file</span> <span class="o">=</span> <span class="n">scratch_dir</span> <span class="o">/</span> <span class="n">ps_opts</span><span class="o">.</span><span class="n">output_file</span>
+
+        <span class="n">pl_opts</span> <span class="o">=</span> <span class="n">values</span><span class="p">[</span><span class="s2">&quot;phase_linking&quot;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">pl_opts</span><span class="o">.</span><span class="n">directory</span><span class="o">.</span><span class="n">parent</span> <span class="o">==</span> <span class="n">scratch_dir</span><span class="p">:</span>
+            <span class="n">values</span><span class="p">[</span><span class="s2">&quot;phase_linking&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">directory</span> <span class="o">=</span> <span class="n">scratch_dir</span> <span class="o">/</span> <span class="n">pl_opts</span><span class="o">.</span><span class="n">directory</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">pl_opts</span><span class="o">.</span><span class="n">compressed_slc_file</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">parent</span> <span class="o">==</span> <span class="n">scratch_dir</span><span class="p">:</span>
+            <span class="n">values</span><span class="p">[</span><span class="s2">&quot;phase_linking&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">compressed_slc_file</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">scratch_dir</span> <span class="o">/</span> <span class="n">pl_opts</span><span class="o">.</span><span class="n">compressed_slc_file</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">pl_opts</span><span class="o">.</span><span class="n">temp_coh_file</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">parent</span> <span class="o">==</span> <span class="n">scratch_dir</span><span class="p">:</span>
+            <span class="n">values</span><span class="p">[</span><span class="s2">&quot;phase_linking&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">temp_coh_file</span> <span class="o">=</span> <span class="n">scratch_dir</span> <span class="o">/</span> <span class="n">pl_opts</span><span class="o">.</span><span class="n">temp_coh_file</span>
+
+        <span class="n">unw_opts</span> <span class="o">=</span> <span class="n">values</span><span class="p">[</span><span class="s2">&quot;unwrap_options&quot;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">unw_opts</span><span class="o">.</span><span class="n">directory</span><span class="o">.</span><span class="n">parent</span> <span class="o">==</span> <span class="n">scratch_dir</span><span class="p">:</span>
+            <span class="n">values</span><span class="p">[</span><span class="s2">&quot;unwrap_options&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">directory</span> <span class="o">=</span> <span class="n">scratch_dir</span> <span class="o">/</span> <span class="n">unw_opts</span><span class="o">.</span><span class="n">directory</span>
+
+        <span class="k">return</span> <span class="n">values</span>
+
+    <span class="c1"># Extra model exporting options beyond .dict() or .json()</span>
+    <span class="k">def</span> <span class="nf">to_yaml</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_path</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">PathOrStr</span><span class="p">,</span> <span class="n">TextIO</span><span class="p">]):</span>
+        <span class="sd">&quot;&quot;&quot;Save workflow configuration as a yaml file.</span>
+
+<span class="sd">        Used to record the default-filled version of a supplied yaml.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        output_path : Pathlike</span>
+<span class="sd">            Path to the yaml file to save.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">json</span><span class="p">())</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">YAML</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">output_path</span><span class="p">,</span> <span class="s2">&quot;write&quot;</span><span class="p">):</span>
+            <span class="n">y</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">output_path</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">output_path</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">y</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_yaml</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">yaml_path</span><span class="p">:</span> <span class="n">PathOrStr</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Load a workflow configuration from a yaml file.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        yaml_path : Pathlike</span>
+<span class="sd">            Path to the yaml file to load.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Config</span>
+<span class="sd">            Workflow configuration</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">YAML</span><span class="p">(</span><span class="n">typ</span><span class="o">=</span><span class="s2">&quot;safe&quot;</span><span class="p">)</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">yaml_path</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="o">**</span><span class="n">data</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+        </details>
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h3 id="dolphin.workflows.config.Config.from_yaml" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">from_yaml</span><span class="p">(</span><span class="n">yaml_path</span><span class="p">)</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-classmethod"><code>classmethod</code></small>
+  </span>
+
+</h3>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Load a workflow configuration from a yaml file.</p>
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>yaml_path</code></td>
+          <td>
+                <code>Pathlike</code>
+          </td>
+          <td><p>Path to the yaml file to load.</p></td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+  <p><strong>Returns:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td>
+                <code><a class="autorefs autorefs-internal" title="dolphin.workflows.config.Config" href="#dolphin.workflows.config.Config">Config</a></code>
+          </td>
+          <td><p>Workflow configuration</p></td>
+        </tr>
+    </tbody>
+  </table>
+
+      <details class="quote">
+        <summary>Source code in <code>dolphin/workflows/config.py</code></summary>
+        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">373</span>
+<span class="normal">374</span>
+<span class="normal">375</span>
+<span class="normal">376</span>
+<span class="normal">377</span>
+<span class="normal">378</span>
+<span class="normal">379</span>
+<span class="normal">380</span>
+<span class="normal">381</span>
+<span class="normal">382</span>
+<span class="normal">383</span>
+<span class="normal">384</span>
+<span class="normal">385</span>
+<span class="normal">386</span>
+<span class="normal">387</span>
+<span class="normal">388</span>
+<span class="normal">389</span>
+<span class="normal">390</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@classmethod</span>
+<span class="k">def</span> <span class="nf">from_yaml</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">yaml_path</span><span class="p">:</span> <span class="n">PathOrStr</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Load a workflow configuration from a yaml file.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    yaml_path : Pathlike</span>
+<span class="sd">        Path to the yaml file to load.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Config</span>
+<span class="sd">        Workflow configuration</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">YAML</span><span class="p">(</span><span class="n">typ</span><span class="o">=</span><span class="s2">&quot;safe&quot;</span><span class="p">)</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">yaml_path</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+    <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="o">**</span><span class="n">data</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+      </details>
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+
+<h3 id="dolphin.workflows.config.Config.to_yaml" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">to_yaml</span><span class="p">(</span><span class="n">output_path</span><span class="p">)</span></code>
+
+</h3>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Save workflow configuration as a yaml file.</p>
+<p>Used to record the default-filled version of a supplied yaml.</p>
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>output_path</code></td>
+          <td>
+                <code>Pathlike</code>
+          </td>
+          <td><p>Path to the yaml file to save.</p></td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+      <details class="quote">
+        <summary>Source code in <code>dolphin/workflows/config.py</code></summary>
+        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">355</span>
+<span class="normal">356</span>
+<span class="normal">357</span>
+<span class="normal">358</span>
+<span class="normal">359</span>
+<span class="normal">360</span>
+<span class="normal">361</span>
+<span class="normal">362</span>
+<span class="normal">363</span>
+<span class="normal">364</span>
+<span class="normal">365</span>
+<span class="normal">366</span>
+<span class="normal">367</span>
+<span class="normal">368</span>
+<span class="normal">369</span>
+<span class="normal">370</span>
+<span class="normal">371</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">to_yaml</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_path</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">PathOrStr</span><span class="p">,</span> <span class="n">TextIO</span><span class="p">]):</span>
+    <span class="sd">&quot;&quot;&quot;Save workflow configuration as a yaml file.</span>
+
+<span class="sd">    Used to record the default-filled version of a supplied yaml.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    output_path : Pathlike</span>
+<span class="sd">        Path to the yaml file to save.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">json</span><span class="p">())</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">YAML</span><span class="p">()</span>
+    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">output_path</span><span class="p">,</span> <span class="s2">&quot;write&quot;</span><span class="p">):</span>
+        <span class="n">y</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">output_path</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">output_path</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">y</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+      </details>
+  </div>
+
+</div>
+
+
+
+  </div>
+
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="dolphin.workflows.config.HalfWindow" class="doc doc-heading">
+        <code>HalfWindow</code>
+
+
+</h2>
+
+
+  <div class="doc doc-contents ">
+      <p class="doc doc-class-bases">
+        Bases: <code><span title="pydantic.BaseModel">BaseModel</span></code></p>
+
+  
+      <p>Class to hold half-window size for multi-looking during phase linking.</p>
+
+
+        <details class="quote">
+          <summary>Source code in <code>dolphin/workflows/config.py</code></summary>
+          <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">78</span>
+<span class="normal">79</span>
+<span class="normal">80</span>
+<span class="normal">81</span>
+<span class="normal">82</span>
+<span class="normal">83</span>
+<span class="normal">84</span>
+<span class="normal">85</span>
+<span class="normal">86</span>
+<span class="normal">87</span>
+<span class="normal">88</span>
+<span class="normal">89</span>
+<span class="normal">90</span>
+<span class="normal">91</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">HalfWindow</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Class to hold half-window size for multi-looking during phase linking.&quot;&quot;&quot;</span>
+
+    <span class="n">x</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="mi">11</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Half window size (in pixels) for x direction&quot;</span><span class="p">,</span> <span class="n">gt</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">y</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Half window size (in pixels) for y direction&quot;</span><span class="p">,</span> <span class="n">gt</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">to_looks</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Convert (x, y) half-window size to (row, column) looks.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">+</span> <span class="mi">1</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_looks</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">row_looks</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">col_looks</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create a half-window from looks.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">col_looks</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">row_looks</span> <span class="o">//</span> <span class="mi">2</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+        </details>
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h3 id="dolphin.workflows.config.HalfWindow.from_looks" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">from_looks</span><span class="p">(</span><span class="n">row_looks</span><span class="p">,</span> <span class="n">col_looks</span><span class="p">)</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-classmethod"><code>classmethod</code></small>
+  </span>
+
+</h3>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Create a half-window from looks.</p>
+
+      <details class="quote">
+        <summary>Source code in <code>dolphin/workflows/config.py</code></summary>
+        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">88</span>
+<span class="normal">89</span>
+<span class="normal">90</span>
+<span class="normal">91</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@classmethod</span>
+<span class="k">def</span> <span class="nf">from_looks</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">row_looks</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">col_looks</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Create a half-window from looks.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">col_looks</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">row_looks</span> <span class="o">//</span> <span class="mi">2</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+      </details>
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+
+<h3 id="dolphin.workflows.config.HalfWindow.to_looks" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">to_looks</span><span class="p">()</span></code>
+
+</h3>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Convert (x, y) half-window size to (row, column) looks.</p>
+
+      <details class="quote">
+        <summary>Source code in <code>dolphin/workflows/config.py</code></summary>
+        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">84</span>
+<span class="normal">85</span>
+<span class="normal">86</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">to_looks</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Convert (x, y) half-window size to (row, column) looks.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">+</span> <span class="mi">1</span>
+</code></pre></div></td></tr></table></div>
+      </details>
+  </div>
+
+</div>
+
+
+
+  </div>
+
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="dolphin.workflows.config.Inputs" class="doc doc-heading">
+        <code>Inputs</code>
+
+
+</h2>
+
+
+  <div class="doc doc-contents ">
+      <p class="doc doc-class-bases">
+        Bases: <code><span title="pydantic.BaseModel">BaseModel</span></code></p>
+
+  
+      <p>Options specifying input datasets for workflow.</p>
+
+
+        <details class="quote">
+          <summary>Source code in <code>dolphin/workflows/config.py</code></summary>
+          <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">213</span>
+<span class="normal">214</span>
+<span class="normal">215</span>
+<span class="normal">216</span>
+<span class="normal">217</span>
+<span class="normal">218</span>
+<span class="normal">219</span>
+<span class="normal">220</span>
+<span class="normal">221</span>
+<span class="normal">222</span>
+<span class="normal">223</span>
+<span class="normal">224</span>
+<span class="normal">225</span>
+<span class="normal">226</span>
+<span class="normal">227</span>
+<span class="normal">228</span>
+<span class="normal">229</span>
+<span class="normal">230</span>
+<span class="normal">231</span>
+<span class="normal">232</span>
+<span class="normal">233</span>
+<span class="normal">234</span>
+<span class="normal">235</span>
+<span class="normal">236</span>
+<span class="normal">237</span>
+<span class="normal">238</span>
+<span class="normal">239</span>
+<span class="normal">240</span>
+<span class="normal">241</span>
+<span class="normal">242</span>
+<span class="normal">243</span>
+<span class="normal">244</span>
+<span class="normal">245</span>
+<span class="normal">246</span>
+<span class="normal">247</span>
+<span class="normal">248</span>
+<span class="normal">249</span>
+<span class="normal">250</span>
+<span class="normal">251</span>
+<span class="normal">252</span>
+<span class="normal">253</span>
+<span class="normal">254</span>
+<span class="normal">255</span>
+<span class="normal">256</span>
+<span class="normal">257</span>
+<span class="normal">258</span>
+<span class="normal">259</span>
+<span class="normal">260</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">Inputs</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Options specifying input datasets for workflow.&quot;&quot;&quot;</span>
+
+    <span class="n">cslc_file_list</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">PathOrStr</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;List of CSLC files&quot;</span>
+    <span class="p">)</span>
+    <span class="n">cslc_directory</span><span class="p">:</span> <span class="n">DirectoryPath</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Path to CSLC files&quot;</span><span class="p">)</span>
+    <span class="n">cslc_file_ext</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="s2">&quot;.nc&quot;</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Extension of CSLC files (if providing `cslc_directory`)&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">cslc_date_fmt</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="s2">&quot;%Y%m</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Format of dates contained in CSLC filenames&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">mask_files</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="p">(</span>
+            <span class="s2">&quot;List of mask files to use, where convention is&quot;</span>
+            <span class="s2">&quot; 0 for no data/invalid, and 1 for data.&quot;</span>
+        <span class="p">),</span>
+    <span class="p">)</span>
+
+    <span class="c1"># validators</span>
+    <span class="nd">@validator</span><span class="p">(</span><span class="s2">&quot;mask_files&quot;</span><span class="p">,</span> <span class="s2">&quot;cslc_file_list&quot;</span><span class="p">,</span> <span class="n">pre</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_check_mask_files</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">return</span> <span class="p">[</span><span class="n">v</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="n">v</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[]</span>
+        <span class="k">return</span> <span class="n">v</span>
+
+    <span class="nd">@root_validator</span>
+    <span class="k">def</span> <span class="nf">_check_slc_files_exist</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
+        <span class="n">file_list</span> <span class="o">=</span> <span class="n">values</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;cslc_file_list&quot;</span><span class="p">)</span>
+        <span class="n">directory</span> <span class="o">=</span> <span class="n">values</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;cslc_directory&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">file_list</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">directory</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Must specify either cslc_file_list or cslc_directory&quot;</span><span class="p">)</span>
+
+            <span class="n">ext</span> <span class="o">=</span> <span class="n">values</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;cslc_file_ext&quot;</span><span class="p">)</span>
+            <span class="n">file_list</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">directory</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;*</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">))</span>
+            <span class="c1"># Filter out files that don&#39;t have dates in the filename</span>
+            <span class="n">date_fmt</span> <span class="o">=</span> <span class="n">values</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;cslc_date_fmt&quot;</span><span class="p">)</span>
+            <span class="n">file_list</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">file_list</span> <span class="k">if</span> <span class="n">get_dates</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="n">date_fmt</span><span class="p">)]</span>
+            <span class="n">values</span><span class="p">[</span><span class="s2">&quot;cslc_file_list&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">file_list</span>
+        <span class="k">return</span> <span class="n">values</span>
+</code></pre></div></td></tr></table></div>
+        </details>
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="dolphin.workflows.config.InterferogramNetwork" class="doc doc-heading">
+        <code>InterferogramNetwork</code>
+
+
+</h2>
+
+
+  <div class="doc doc-contents ">
+      <p class="doc doc-class-bases">
+        Bases: <code><span title="pydantic.BaseModel">BaseModel</span></code></p>
+
+  
+      <p>Options to determine the type of network for interferogram formation.</p>
+
+
+        <details class="quote">
+          <summary>Source code in <code>dolphin/workflows/config.py</code></summary>
+          <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">118</span>
+<span class="normal">119</span>
+<span class="normal">120</span>
+<span class="normal">121</span>
+<span class="normal">122</span>
+<span class="normal">123</span>
+<span class="normal">124</span>
+<span class="normal">125</span>
+<span class="normal">126</span>
+<span class="normal">127</span>
+<span class="normal">128</span>
+<span class="normal">129</span>
+<span class="normal">130</span>
+<span class="normal">131</span>
+<span class="normal">132</span>
+<span class="normal">133</span>
+<span class="normal">134</span>
+<span class="normal">135</span>
+<span class="normal">136</span>
+<span class="normal">137</span>
+<span class="normal">138</span>
+<span class="normal">139</span>
+<span class="normal">140</span>
+<span class="normal">141</span>
+<span class="normal">142</span>
+<span class="normal">143</span>
+<span class="normal">144</span>
+<span class="normal">145</span>
+<span class="normal">146</span>
+<span class="normal">147</span>
+<span class="normal">148</span>
+<span class="normal">149</span>
+<span class="normal">150</span>
+<span class="normal">151</span>
+<span class="normal">152</span>
+<span class="normal">153</span>
+<span class="normal">154</span>
+<span class="normal">155</span>
+<span class="normal">156</span>
+<span class="normal">157</span>
+<span class="normal">158</span>
+<span class="normal">159</span>
+<span class="normal">160</span>
+<span class="normal">161</span>
+<span class="normal">162</span>
+<span class="normal">163</span>
+<span class="normal">164</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">InterferogramNetwork</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Options to determine the type of network for interferogram formation.&quot;&quot;&quot;</span>
+
+    <span class="n">reference_idx</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="kc">None</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="p">(</span>
+            <span class="s2">&quot;For single-reference network: Index of the reference image in the network&quot;</span>
+        <span class="p">),</span>
+    <span class="p">)</span>
+    <span class="n">max_bandwidth</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="kc">None</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Max `n` to form the nearest-`n` interferograms by index.&quot;</span><span class="p">,</span>
+        <span class="n">gt</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">max_temporal_baseline</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="kc">None</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Maximum temporal baseline of interferograms&quot;</span><span class="p">,</span>
+        <span class="n">gt</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">network_type</span> <span class="o">=</span> <span class="n">InterferogramNetworkType</span><span class="o">.</span><span class="n">SINGLE_REFERENCE</span>
+
+    <span class="c1"># validation</span>
+    <span class="nd">@root_validator</span>
+    <span class="k">def</span> <span class="nf">_check_network_type</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
+        <span class="n">ref_idx</span> <span class="o">=</span> <span class="n">values</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;reference_idx&quot;</span><span class="p">)</span>
+        <span class="n">max_bw</span> <span class="o">=</span> <span class="n">values</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;max_bandwidth&quot;</span><span class="p">)</span>
+        <span class="n">max_tb</span> <span class="o">=</span> <span class="n">values</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;max_temporal_baseline&quot;</span><span class="p">)</span>
+        <span class="c1"># Check if more than one has been set:</span>
+        <span class="k">if</span> <span class="nb">sum</span><span class="p">([</span><span class="n">ref_idx</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="n">max_bw</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="n">max_tb</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;Only one of `reference_idx`, `max_bandwidth`, or&quot;</span>
+                <span class="s2">&quot; `max_temporal_baseline` can be set.&quot;</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="n">max_tb</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">values</span><span class="p">[</span><span class="s2">&quot;network_type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">InterferogramNetworkType</span><span class="o">.</span><span class="n">TEMPORAL_BASELINE</span>
+            <span class="k">return</span> <span class="n">values</span>
+
+        <span class="k">if</span> <span class="n">max_bw</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">values</span><span class="p">[</span><span class="s2">&quot;network_type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">InterferogramNetworkType</span><span class="o">.</span><span class="n">BANDWIDTH</span>
+            <span class="k">return</span> <span class="n">values</span>
+
+        <span class="c1"># If nothing else specified, set to a single reference network</span>
+        <span class="n">values</span><span class="p">[</span><span class="s2">&quot;network_type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">InterferogramNetworkType</span><span class="o">.</span><span class="n">SINGLE_REFERENCE</span>
+        <span class="c1"># and make sure the reference index is set</span>
+        <span class="k">if</span> <span class="n">ref_idx</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">values</span><span class="p">[</span><span class="s2">&quot;reference_idx&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">return</span> <span class="n">values</span>
+</code></pre></div></td></tr></table></div>
+        </details>
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="dolphin.workflows.config.Outputs" class="doc doc-heading">
+        <code>Outputs</code>
+
+
+</h2>
+
+
+  <div class="doc doc-contents ">
+      <p class="doc doc-class-bases">
+        Bases: <code><span title="pydantic.BaseModel">BaseModel</span></code></p>
+
+  
+      <p>Options for the output format/compressions.</p>
+
+
+        <details class="quote">
+          <summary>Source code in <code>dolphin/workflows/config.py</code></summary>
+          <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">263</span>
+<span class="normal">264</span>
+<span class="normal">265</span>
+<span class="normal">266</span>
+<span class="normal">267</span>
+<span class="normal">268</span>
+<span class="normal">269</span>
+<span class="normal">270</span>
+<span class="normal">271</span>
+<span class="normal">272</span>
+<span class="normal">273</span>
+<span class="normal">274</span>
+<span class="normal">275</span>
+<span class="normal">276</span>
+<span class="normal">277</span>
+<span class="normal">278</span>
+<span class="normal">279</span>
+<span class="normal">280</span>
+<span class="normal">281</span>
+<span class="normal">282</span>
+<span class="normal">283</span>
+<span class="normal">284</span>
+<span class="normal">285</span>
+<span class="normal">286</span>
+<span class="normal">287</span>
+<span class="normal">288</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">Outputs</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Options for the output format/compressions.&quot;&quot;&quot;</span>
+
+    <span class="n">output_format</span><span class="p">:</span> <span class="n">OutputFormat</span> <span class="o">=</span> <span class="n">OutputFormat</span><span class="o">.</span><span class="n">NETCDF</span>
+    <span class="n">scratch_directory</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;scratch&quot;</span><span class="p">)</span>
+    <span class="c1"># TODO: spacing, strides, etc.</span>
+    <span class="n">output_directory</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;output&quot;</span><span class="p">)</span>
+
+    <span class="n">hdf5_creation_options</span><span class="p">:</span> <span class="n">Dict</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="nb">dict</span><span class="p">(</span>
+            <span class="n">chunks</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">compression</span><span class="o">=</span><span class="s2">&quot;gzip&quot;</span><span class="p">,</span>
+            <span class="n">compression_opts</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+            <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">),</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Options for `create_dataset` with h5py.&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">gtiff_creation_options</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="p">[</span><span class="s2">&quot;TILED=YES&quot;</span><span class="p">,</span> <span class="s2">&quot;COMPRESS=DEFLATE&quot;</span><span class="p">,</span> <span class="s2">&quot;ZLEVEL=5&quot;</span><span class="p">],</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;GDAL creation options for GeoTIFF files&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="c1"># validators</span>
+    <span class="n">_dir_must_exist</span> <span class="o">=</span> <span class="n">validator</span><span class="p">(</span>
+        <span class="s2">&quot;output_directory&quot;</span><span class="p">,</span> <span class="s2">&quot;scratch_directory&quot;</span><span class="p">,</span> <span class="n">allow_reuse</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">always</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">)(</span><span class="n">_check_and_make_dir</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+        </details>
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="dolphin.workflows.config.PhaseLinkingOptions" class="doc doc-heading">
+        <code>PhaseLinkingOptions</code>
+
+
+</h2>
+
+
+  <div class="doc doc-contents ">
+      <p class="doc doc-class-bases">
+        Bases: <code><span title="pydantic.BaseModel">BaseModel</span></code></p>
+
+  
+      <p>Configurable options for wrapped phase estimation.</p>
+
+
+        <details class="quote">
+          <summary>Source code in <code>dolphin/workflows/config.py</code></summary>
+          <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 94</span>
+<span class="normal"> 95</span>
+<span class="normal"> 96</span>
+<span class="normal"> 97</span>
+<span class="normal"> 98</span>
+<span class="normal"> 99</span>
+<span class="normal">100</span>
+<span class="normal">101</span>
+<span class="normal">102</span>
+<span class="normal">103</span>
+<span class="normal">104</span>
+<span class="normal">105</span>
+<span class="normal">106</span>
+<span class="normal">107</span>
+<span class="normal">108</span>
+<span class="normal">109</span>
+<span class="normal">110</span>
+<span class="normal">111</span>
+<span class="normal">112</span>
+<span class="normal">113</span>
+<span class="normal">114</span>
+<span class="normal">115</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">PhaseLinkingOptions</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Configurable options for wrapped phase estimation.&quot;&quot;&quot;</span>
+
+    <span class="n">directory</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;linked_phase&quot;</span><span class="p">)</span>
+    <span class="n">ministack_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="mi">15</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Size of the ministack for sequential estimator.&quot;</span><span class="p">,</span> <span class="n">gt</span><span class="o">=</span><span class="mi">1</span>
+    <span class="p">)</span>
+    <span class="n">half_window</span> <span class="o">=</span> <span class="n">HalfWindow</span><span class="p">()</span>
+    <span class="n">compressed_slc_file</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;compressed_slc.tif&quot;</span><span class="p">)</span>
+    <span class="n">temp_coh_file</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;temp_coh.tif&quot;</span><span class="p">)</span>
+
+    <span class="c1"># validators</span>
+    <span class="n">_dir_must_exist</span> <span class="o">=</span> <span class="n">validator</span><span class="p">(</span><span class="s2">&quot;directory&quot;</span><span class="p">,</span> <span class="n">allow_reuse</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">always</span><span class="o">=</span><span class="kc">True</span><span class="p">)(</span>
+        <span class="n">_check_and_make_dir</span>
+    <span class="p">)</span>
+    <span class="n">_move_in_dir</span> <span class="o">=</span> <span class="n">validator</span><span class="p">(</span>
+        <span class="s2">&quot;compressed_slc_file&quot;</span><span class="p">,</span> <span class="s2">&quot;temp_coh_file&quot;</span><span class="p">,</span> <span class="n">allow_reuse</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">always</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">)(</span><span class="n">_move_file_in_dir</span><span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_format_date_pair</span><span class="p">(</span><span class="n">start</span><span class="p">:</span> <span class="n">date</span><span class="p">,</span> <span class="n">end</span><span class="p">:</span> <span class="n">date</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s2">&quot;%Y%m</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">start</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="n">fmt</span><span class="p">)</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">end</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="n">fmt</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+</code></pre></div></td></tr></table></div>
+        </details>
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="dolphin.workflows.config.PsOptions" class="doc doc-heading">
+        <code>PsOptions</code>
+
+
+</h2>
+
+
+  <div class="doc doc-contents ">
+      <p class="doc doc-class-bases">
+        Bases: <code><span title="pydantic.BaseModel">BaseModel</span></code></p>
+
+  
+      <p>Options for the PS pixel selection portion of the workflow.</p>
+
+
+        <details class="quote">
+          <summary>Source code in <code>dolphin/workflows/config.py</code></summary>
+          <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">50</span>
+<span class="normal">51</span>
+<span class="normal">52</span>
+<span class="normal">53</span>
+<span class="normal">54</span>
+<span class="normal">55</span>
+<span class="normal">56</span>
+<span class="normal">57</span>
+<span class="normal">58</span>
+<span class="normal">59</span>
+<span class="normal">60</span>
+<span class="normal">61</span>
+<span class="normal">62</span>
+<span class="normal">63</span>
+<span class="normal">64</span>
+<span class="normal">65</span>
+<span class="normal">66</span>
+<span class="normal">67</span>
+<span class="normal">68</span>
+<span class="normal">69</span>
+<span class="normal">70</span>
+<span class="normal">71</span>
+<span class="normal">72</span>
+<span class="normal">73</span>
+<span class="normal">74</span>
+<span class="normal">75</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">PsOptions</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Options for the PS pixel selection portion of the workflow.&quot;&quot;&quot;</span>
+
+    <span class="n">directory</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;PS&quot;</span><span class="p">)</span>
+    <span class="n">output_file</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;ps_pixels.tif&quot;</span><span class="p">)</span>
+    <span class="n">amp_dispersion_file</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;amp_dispersion.tif&quot;</span><span class="p">)</span>
+    <span class="n">amp_mean_file</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;amp_mean.tif&quot;</span><span class="p">)</span>
+
+    <span class="n">amp_dispersion_threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="mf">0.42</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Amplitude dispersion threshold to consider a pixel a PS.&quot;</span><span class="p">,</span>
+        <span class="n">gt</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="c1"># validators: Check directory exists, and that outputs are within directory</span>
+    <span class="n">_dir_must_exist</span> <span class="o">=</span> <span class="n">validator</span><span class="p">(</span><span class="s2">&quot;directory&quot;</span><span class="p">,</span> <span class="n">allow_reuse</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">always</span><span class="o">=</span><span class="kc">True</span><span class="p">)(</span>
+        <span class="n">_check_and_make_dir</span>
+    <span class="p">)</span>
+
+    <span class="n">_move_in_dir</span> <span class="o">=</span> <span class="n">validator</span><span class="p">(</span>
+        <span class="s2">&quot;output_file&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;amp_dispersion_file&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;amp_mean_file&quot;</span><span class="p">,</span>
+        <span class="n">always</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">allow_reuse</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)(</span><span class="n">_move_file_in_dir</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+        </details>
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="dolphin.workflows.config.UnwrapOptions" class="doc doc-heading">
+        <code>UnwrapOptions</code>
+
+
+</h2>
+
+
+  <div class="doc doc-contents ">
+      <p class="doc doc-class-bases">
+        Bases: <code><span title="pydantic.BaseModel">BaseModel</span></code></p>
+
+  
+      <p>Options for unwrapping after wrapped phase estimation.</p>
+
+
+        <details class="quote">
+          <summary>Source code in <code>dolphin/workflows/config.py</code></summary>
+          <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">167</span>
+<span class="normal">168</span>
+<span class="normal">169</span>
+<span class="normal">170</span>
+<span class="normal">171</span>
+<span class="normal">172</span>
+<span class="normal">173</span>
+<span class="normal">174</span>
+<span class="normal">175</span>
+<span class="normal">176</span>
+<span class="normal">177</span>
+<span class="normal">178</span>
+<span class="normal">179</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">UnwrapOptions</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Options for unwrapping after wrapped phase estimation.&quot;&quot;&quot;</span>
+
+    <span class="n">run_unwrap</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">directory</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;unwrap&quot;</span><span class="p">)</span>
+    <span class="n">unwrap_method</span><span class="p">:</span> <span class="n">UnwrapMethod</span> <span class="o">=</span> <span class="n">UnwrapMethod</span><span class="o">.</span><span class="n">SNAPHU</span>
+    <span class="n">tiles</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="n">init_method</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;mcf&quot;</span>
+
+    <span class="c1"># validators</span>
+    <span class="n">_dir_must_exist</span> <span class="o">=</span> <span class="n">validator</span><span class="p">(</span><span class="s2">&quot;directory&quot;</span><span class="p">,</span> <span class="n">allow_reuse</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">always</span><span class="o">=</span><span class="kc">True</span><span class="p">)(</span>
+        <span class="n">_check_and_make_dir</span>
+    <span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+        </details>
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="dolphin.workflows.config.WorkerSettings" class="doc doc-heading">
+        <code>WorkerSettings</code>
+
+
+</h2>
+
+
+  <div class="doc doc-contents ">
+      <p class="doc doc-class-bases">
+        Bases: <code><span title="pydantic.BaseSettings">BaseSettings</span></code></p>
+
+  
+      <p>Settings configurable based on environment variables.</p>
+
+
+        <details class="quote">
+          <summary>Source code in <code>dolphin/workflows/config.py</code></summary>
+          <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">182</span>
+<span class="normal">183</span>
+<span class="normal">184</span>
+<span class="normal">185</span>
+<span class="normal">186</span>
+<span class="normal">187</span>
+<span class="normal">188</span>
+<span class="normal">189</span>
+<span class="normal">190</span>
+<span class="normal">191</span>
+<span class="normal">192</span>
+<span class="normal">193</span>
+<span class="normal">194</span>
+<span class="normal">195</span>
+<span class="normal">196</span>
+<span class="normal">197</span>
+<span class="normal">198</span>
+<span class="normal">199</span>
+<span class="normal">200</span>
+<span class="normal">201</span>
+<span class="normal">202</span>
+<span class="normal">203</span>
+<span class="normal">204</span>
+<span class="normal">205</span>
+<span class="normal">206</span>
+<span class="normal">207</span>
+<span class="normal">208</span>
+<span class="normal">209</span>
+<span class="normal">210</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">WorkerSettings</span><span class="p">(</span><span class="n">BaseSettings</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Settings configurable based on environment variables.&quot;&quot;&quot;</span>
+
+    <span class="n">gpu_enabled</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="kc">True</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Whether to use GPU for processing (if available)&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">gpu_id</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="mi">0</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Index of the GPU to use for processing (if GPU)&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="c1"># n_workers: int = PositiveInt(16)</span>
+    <span class="n">n_workers</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="mi">16</span><span class="p">,</span> <span class="n">ge</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Number of cpu cores to use for processing (if CPU)&quot;</span>
+    <span class="p">)</span>
+    <span class="n">max_ram_gb</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="mf">1.0</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Maximum RAM (in GB) to use for processing&quot;</span><span class="p">,</span>
+        <span class="n">gt</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">class</span> <span class="nc">Config</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Pydantic class configuration for BaseSettings.&quot;&quot;&quot;</span>
+
+        <span class="c1"># https://docs.pydantic.dev/usage/settings/#parsing-environment-variable-values</span>
+        <span class="n">env_prefix</span> <span class="o">=</span> <span class="s2">&quot;dolphin_&quot;</span>  <span class="c1"># e.g. DOLPHIN_N_WORKERS=4 for n_workers</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;gpu_enabled&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;env&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;dolphin_gpu_enabled&quot;</span><span class="p">,</span> <span class="s2">&quot;gpu&quot;</span><span class="p">]},</span>
+        <span class="p">}</span>
+</code></pre></div></td></tr></table></div>
+        </details>
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="dolphin.workflows.config.WorkerSettings.Config" class="doc doc-heading">
+        <code>Config</code>
+
+
+</h3>
+
+
+  <div class="doc doc-contents ">
+
+  
+      <p>Pydantic class configuration for BaseSettings.</p>
+
+
+        <details class="quote">
+          <summary>Source code in <code>dolphin/workflows/config.py</code></summary>
+          <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">203</span>
+<span class="normal">204</span>
+<span class="normal">205</span>
+<span class="normal">206</span>
+<span class="normal">207</span>
+<span class="normal">208</span>
+<span class="normal">209</span>
+<span class="normal">210</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">Config</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Pydantic class configuration for BaseSettings.&quot;&quot;&quot;</span>
+
+    <span class="c1"># https://docs.pydantic.dev/usage/settings/#parsing-environment-variable-values</span>
+    <span class="n">env_prefix</span> <span class="o">=</span> <span class="s2">&quot;dolphin_&quot;</span>  <span class="c1"># e.g. DOLPHIN_N_WORKERS=4 for n_workers</span>
+    <span class="n">fields</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;gpu_enabled&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;env&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;dolphin_gpu_enabled&quot;</span><span class="p">,</span> <span class="s2">&quot;gpu&quot;</span><span class="p">]},</span>
+    <span class="p">}</span>
+</code></pre></div></td></tr></table></div>
+        </details>
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+  </div>
+
+</div>
+
+
+
+
+  </div>
+
+  </div>
+
+</div>
+
+
+
+
+  </div>
+
+  </div>
+
+</div>
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+    <nav class="md-footer__inner md-grid" aria-label="Footer" >
+      
+        
+        <a href="../_run_cli/" class="md-footer__link md-footer__link--prev" aria-label="Previous: _run_cli" rel="prev">
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+          </div>
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              _run_cli
+            </div>
+          </div>
+        </a>
+      
+      
+        
+        <a href="../s1_disp_stack/" class="md-footer__link md-footer__link--next" aria-label="Next: s1_disp_stack" rel="next">
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              s1_disp_stack
+            </div>
+          </div>
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4Z"/></svg>
+          </div>
+        </a>
+      
+    </nav>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    <script id="__config" type="application/json">{"base": "../../../..", "features": [], "search": "../../../../assets/javascripts/workers/search.16e2a7d4.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "version": {"provider": "mike"}}</script>
+    
+    
+      <script src="../../../../assets/javascripts/bundle.d6c3db9e.min.js"></script>
+      
+        <script src="../../../../javascripts/mathjax.js"></script>
+      
+        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>
