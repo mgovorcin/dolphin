@@ -1,0 +1,7 @@
+black
+flake8
+pooch
+pre-commit
+pytest
+pytest-cov
+pytest-xdist # parallel tests: https://pytest-xdist.readthedocs.io/en/latest/
