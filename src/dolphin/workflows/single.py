@@ -59,6 +59,7 @@ def run_wrapped_phase_single(
     shp_alpha: float = 0.05,
     shp_nslc: Optional[int] = None,
     similarity_nearest_n: int | None = None,
+    similarity_search_radius: int = 11,
     write_closure_phase: bool = True,
     write_crlb: bool = True,
     block_shape: tuple[int, int] = (512, 512),
@@ -262,11 +263,13 @@ def run_wrapped_phase_single(
                 first_real_slc_idx=ministack.first_real_slc_idx,
                 compute_crlb=write_crlb,
             )
-        except PhaseLinkRuntimeError as e:
+        except (PhaseLinkRuntimeError, ValueError) as e:
             # note: this is a warning instead of info, since it should
             # get caught at the "skip_empty" step
+            # ValueError also covers JAX cuSolver errors ("INTERNAL: cuSolver
+            # internal error") that arise on NaN/degenerate edge blocks.
             msg = f"At block {in_rows.start}, {in_cols.start}: {e}"
-            if "are all NaNs" in e.args[0]:
+            if "are all NaNs" in str(e.args[0] if e.args else e):
                 # Some SLCs in the ministack are all NaNs
                 # This happens from a shifting burst window near the edges,
                 # and seems to cause no issues
@@ -387,6 +390,7 @@ def run_wrapped_phase_single(
         num_threads=1,
         add_overviews=False,
         nearest_n=similarity_nearest_n,
+        search_radius=similarity_search_radius,
         block_shape=block_shape,
     )
 
