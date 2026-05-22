@@ -212,7 +212,11 @@ def run(
         is_single_ref = _is_single_reference_network(
             cfg.interferogram_network, cfg.unwrap_options.unwrap_method
         )
-        similarity_nearest_n = None if is_single_ref else 3
+        similarity_nearest_n: int | None
+        if cfg.phase_linking.similarity_nearest_n is not None:
+            similarity_nearest_n = cfg.phase_linking.similarity_nearest_n
+        else:
+            similarity_nearest_n = None if is_single_ref else 3
 
         # TODO: Need a good way to store the nslc attribute in the PS file...
         # If we pre-compute it from some big stack, we need to use that for SHP
@@ -248,6 +252,7 @@ def run(
             compressed_slc_plan=cfg.phase_linking.compressed_slc_plan,
             max_num_compressed=cfg.phase_linking.max_num_compressed,
             similarity_nearest_n=similarity_nearest_n,
+            similarity_search_radius=cfg.phase_linking.similarity_search_radius,
             cslc_date_fmt=cfg.input_options.cslc_date_fmt,
             write_crlb=cfg.phase_linking.write_crlb,
             write_closure_phase=cfg.phase_linking.write_closure_phase,

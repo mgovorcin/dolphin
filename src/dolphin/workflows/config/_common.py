@@ -168,6 +168,24 @@ class PhaseLinkingOptions(BaseModel, extra="forbid"):
             " the coherence matrix."
         ),
     )
+    similarity_nearest_n: Optional[int] = Field(
+        None,
+        description=(
+            "Number of nearest interferograms to use when computing phase similarity."
+            " If None, uses None for single-reference networks (disables similarity)"
+            " and 3 for sequential/multi-reference networks (default behaviour)."
+            " Set explicitly to override the automatic choice."
+        ),
+        ge=1,
+    )
+    similarity_search_radius: int = Field(
+        7,
+        description=(
+            "Maximum radius (in pixels) to search for neighbors when computing"
+            " phase similarity. Larger values smooth over more pixels."
+        ),
+        ge=1,
+    )
 
 
 class InterferogramNetwork(BaseModel, extra="forbid"):
