@@ -168,6 +168,24 @@ class PhaseLinkingOptions(BaseModel, extra="forbid"):
             " the coherence matrix."
         ),
     )
+    similarity_nearest_n: Optional[int] = Field(
+        None,
+        description=(
+            "Number of nearest interferograms to use when computing phase similarity."
+            " If None, uses None for single-reference networks (disables similarity)"
+            " and 3 for sequential/multi-reference networks (default behaviour)."
+            " Set explicitly to override the automatic choice."
+        ),
+        ge=1,
+    )
+    similarity_search_radius: int = Field(
+        7,
+        description=(
+            "Maximum radius (in pixels) to search for neighbors when computing"
+            " phase similarity. Larger values smooth over more pixels."
+        ),
+        ge=1,
+    )
 
 
 class InterferogramNetwork(BaseModel, extra="forbid"):
@@ -313,6 +331,21 @@ class InputOptions(BaseModel, extra="forbid"):
             " units in the rasters in `timeseries/` to from radians to meters. If None"
             " and sensor is not recognized, outputs remain in radians."
         ),
+    )
+    azimuth_blocks: int = Field(
+    1,
+    description=(
+        "When the input does not match OPERA-burst naming (e.g. NISAR), "
+        "split each input frame into this many azimuth blocks and process "
+        "each block as a synthetic burst. Default 1 = no splitting."
+    ),
+    ge=1,
+    )
+    halo_rows: int | None = Field(
+        None,
+        description="Halo (input rows) on each side of an azimuth block. "
+                    "Default: max(half_window_y, similarity_search_radius * stride_y, "
+                    "(11 // 2) * stride_y) + 3.",
     )
 
 

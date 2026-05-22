@@ -28,6 +28,17 @@ from .config import ShpMethod
 
 logger = logging.getLogger("dolphin")
 
+
+def _in_async_context() -> bool:
+    """Return True if called from within a running asyncio event loop (e.g. Jupyter)."""
+    import asyncio
+
+    try:
+        loop = asyncio.get_running_loop()
+        return loop is not None
+    except RuntimeError:
+        return False
+
 __all__ = ["run_wrapped_phase_single"]
 
 
@@ -209,6 +220,11 @@ def run_wrapped_phase_single(
     ###########################
     write_lock = Lock()
     read_lock = Lock()
+    # ZarrStack reads are thread-safe but calling zarr's sync API from multiple
+    # threads deadlocks inside Jupyter (which has a running event loop).
+    # In a plain script (AWS/CLI) there is no event loop, so parallel reads are
+    # safe and give ~1.5x I/O speedup with many workers.
+    _skip_read_lock = getattr(vrt_stack, "thread_safe", False) and not _in_async_context()
 
     Executor = ThreadPoolExecutor if max_workers > 1 else DummyProcessPoolExecutor
     pbar = tqdm(total=len(blocks), **tqdm_kwargs)
@@ -225,28 +241,30 @@ def run_wrapped_phase_single(
             (in_no_pad_rows, in_no_pad_cols),
             (in_trim_rows, in_trim_cols),
         ) = block
-        with read_lock:
+        if _skip_read_lock:
             cur_data, _ = loader.read(in_rows, in_cols)
-        if np.all(cur_data == 0) or np.isnan(cur_data).all():
+        else:
+            with read_lock:
+                cur_data, _ = loader.read(in_rows, in_cols)
+        if np.all(cur_data == 0):
             return block, None, None, None
-
-        cur_data = cur_data.astype(np.complex64)
+        cur_data = cur_data.astype(np.complex64, copy=False)
 
         # Only actually compute if we need this one
         amp_stack = np.abs(cur_data) if shp_method == "ks" else None
 
         # Compute the neighbor_arrays for this block
-        neighbor_arrays = shp.estimate_neighbors(
-            halfwin_rowcol=(yhalf, xhalf),
-            alpha=shp_alpha,
-            strides=Strides(y=strides_tup[0], x=strides_tup[1]),
-            mean=amp_mean[in_rows, in_cols] if amp_mean is not None else None,
-            var=amp_variance[in_rows, in_cols] if amp_variance is not None else None,
-            nslc=shp_nslc,
-            amp_stack=amp_stack,
-            method=shp_method,
-        )
         try:
+            neighbor_arrays = shp.estimate_neighbors(
+                halfwin_rowcol=(yhalf, xhalf),
+                alpha=shp_alpha,
+                strides=Strides(y=strides_tup[0], x=strides_tup[1]),
+                mean=amp_mean[in_rows, in_cols] if amp_mean is not None else None,
+                var=amp_variance[in_rows, in_cols] if amp_variance is not None else None,
+                nslc=shp_nslc,
+                amp_stack=amp_stack,
+                method=shp_method,
+            )
             pl_output = run_phase_linking(
                 cur_data,
                 half_window=half_window_tup,
@@ -387,7 +405,7 @@ def run_wrapped_phase_single(
     similarity.create_similarities(
         phase_linked_slc_files,
         output_file=output_folder / f"similarity_{start_end}.tif",
-        num_threads=1,
+        num_threads=max_workers,
         add_overviews=False,
         nearest_n=similarity_nearest_n,
         search_radius=similarity_search_radius,

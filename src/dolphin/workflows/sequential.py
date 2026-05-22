@@ -46,6 +46,7 @@ def run_wrapped_phase_sequential(
     beta: float = 0.00,
     zero_correlation_threshold: float = 0.0,
     similarity_nearest_n: int | None = None,
+    similarity_search_radius: int = 7,
     compressed_slc_plan: CompressedSlcPlan = CompressedSlcPlan.ALWAYS_FIRST,
     max_num_compressed: int = 100,
     output_reference_idx: int | None = None,
@@ -114,12 +115,28 @@ def run_wrapped_phase_sequential(
             logger.info(
                 f"Processing {len(cur_files)} SLCs. Output folder: {cur_output_folder}"
             )
-            cur_vrt = VRTStack(
-                cur_files,
-                outfile=output_folder / f"{start_end}.vrt",
-                sort_files=False,
-                subdataset=slc_vrt_stack.subdataset,
+            # Use a ZarrStackSlice when the outer stack supports it.
+            # Zarr chunks (n_dates, 512, 512) match the block access pattern
+            # so all dates for a spatial tile hit one chunk, Blosc-lz4
+            # decompression is faster than HDF5/netCDF4, and nodata pixels
+            # are pre-zeroed at write time.
+            # Falls back to VRTStack if any file (e.g. compressed SLC) is not
+            # in the zarr store.
+            _zarr_slice = (
+                slc_vrt_stack.slice_dates(cur_files)
+                if hasattr(slc_vrt_stack, "slice_dates")
+                else None
             )
+            if _zarr_slice is not None:
+                cur_vrt = _zarr_slice
+                logger.debug("Using ZarrStackSlice for ministack reads.")
+            else:
+                cur_vrt = VRTStack(
+                    cur_files,
+                    outfile=output_folder / f"{start_end}.vrt",
+                    sort_files=False,
+                    subdataset=slc_vrt_stack.subdataset,
+                )
 
             run_wrapped_phase_single(
                 vrt_stack=cur_vrt,
@@ -138,6 +155,7 @@ def run_wrapped_phase_sequential(
                 shp_alpha=shp_alpha,
                 shp_nslc=shp_nslc,
                 similarity_nearest_n=similarity_nearest_n,
+                similarity_search_radius=similarity_search_radius,
                 write_closure_phase=write_closure_phase,
                 write_crlb=write_crlb,
                 block_shape=block_shape,
@@ -194,8 +212,7 @@ def run_wrapped_phase_sequential(
         create_similarities(
             ifg_file_list=cur_output_files,
             output_file=full_similarity_file,
-            # TODO: any of these configurable?
-            search_radius=11,
+            search_radius=similarity_search_radius,
             sim_type="median",
             block_shape=block_shape,
             nearest_n=similarity_nearest_n,

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 import shutil
 import tempfile
 from pathlib import Path
@@ -143,8 +144,9 @@ def repack_raster(
         block_shape = (block_shape, block_shape)
 
     if output_dir is None:
+        tmp_dir = os.environ.get("TMPDIR", None)
         output_file = tempfile.NamedTemporaryFile(  # noqa: SIM115
-            suffix=raster_path.suffix, dir=output_dir, delete=False
+            suffix=raster_path.suffix, dir=tmp_dir, delete=False
         )
         output_path = Path(output_file.name)
     else:

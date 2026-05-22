@@ -89,15 +89,29 @@ def create_image_overviews(
     else:
         resampling = Resampling(resampling)
 
-    flags = gdal.GA_Update if not external else gdal.GA_ReadOnly
-    ds = gdal.Open(fspath(file_path), flags)
-    if ds.GetRasterBand(1).GetOverviewCount() > 0:
-        logger.debug("%s already has overviews. Skipping.", file_path)
+    # Check if file is empty or invalid before attempting to open
+    file_path_obj = Path(file_path)
+    if not file_path_obj.exists() or file_path_obj.stat().st_size == 0:
+        logger.warning(f"File {file_path} is empty or does not exist. Skipping overview creation.")
         return
 
-    gdal.SetConfigOption("COMPRESS_OVERVIEW", compression)
-    gdal.SetConfigOption("GDAL_NUM_THREADS", str(num_gdal_threads))
-    ds.BuildOverviews(resampling.value, levels)
+    try:
+        flags = gdal.GA_Update if not external else gdal.GA_ReadOnly
+        ds = gdal.Open(fspath(file_path), flags)
+        if ds is None:
+            logger.warning(f"Unable to open {file_path} with GDAL. Skipping overview creation.")
+            return
+
+        if ds.GetRasterBand(1).GetOverviewCount() > 0:
+            logger.debug("%s already has overviews. Skipping.", file_path)
+            return
+
+        gdal.SetConfigOption("COMPRESS_OVERVIEW", compression)
+        gdal.SetConfigOption("GDAL_NUM_THREADS", str(num_gdal_threads))
+        ds.BuildOverviews(resampling.value, levels)
+    except Exception as e:
+        logger.warning(f"Error creating overviews for {file_path}: {str(e)}")
+        return
 
 
 def create_overviews(
@@ -125,16 +139,33 @@ def create_overviews(
         Number of parallel threads to run.
 
     """
-    thread_map(
-        lambda file_path: create_image_overviews(
-            Path(file_path),
-            levels=list(levels),
-            image_type=image_type,
-            resampling=resampling,
-        ),
-        file_paths,
-        max_workers=max_workers,
-    )
+    # Filter out empty files before processing
+    valid_files = []
+    for file_path in file_paths:
+        path_obj = Path(file_path)
+        if path_obj.exists() and path_obj.stat().st_size > 0:
+            valid_files.append(file_path)
+        else:
+            logger.warning(f"Skipping empty or non-existent file: {file_path}")
+
+    if not valid_files:
+        logger.warning("No valid files found for overview creation.")
+        return
+
+    try:
+        thread_map(
+            lambda file_path: create_image_overviews(
+                Path(file_path),
+                levels=list(levels),
+                image_type=image_type,
+                resampling=resampling,
+            ),
+            valid_files,
+            max_workers=max_workers,
+        )
+    except Exception as e:
+        logger.error(f"Error in overview creation: {str(e)}")
+        # Continue processing to avoid breaking the workflow
 
 
 def run():
