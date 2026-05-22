@@ -114,12 +114,28 @@ def run_wrapped_phase_sequential(
             logger.info(
                 f"Processing {len(cur_files)} SLCs. Output folder: {cur_output_folder}"
             )
-            cur_vrt = VRTStack(
-                cur_files,
-                outfile=output_folder / f"{start_end}.vrt",
-                sort_files=False,
-                subdataset=slc_vrt_stack.subdataset,
+            # Use a ZarrStackSlice when the outer stack supports it.
+            # Zarr chunks (n_dates, 512, 512) match the block access pattern
+            # so all dates for a spatial tile hit one chunk, Blosc-lz4
+            # decompression is faster than HDF5/netCDF4, and nodata pixels
+            # are pre-zeroed at write time.
+            # Falls back to VRTStack if any file (e.g. compressed SLC) is not
+            # in the zarr store.
+            _zarr_slice = (
+                slc_vrt_stack.slice_dates(cur_files)
+                if hasattr(slc_vrt_stack, "slice_dates")
+                else None
             )
+            if _zarr_slice is not None:
+                cur_vrt = _zarr_slice
+                logger.debug("Using ZarrStackSlice for ministack reads.")
+            else:
+                cur_vrt = VRTStack(
+                    cur_files,
+                    outfile=output_folder / f"{start_end}.vrt",
+                    sort_files=False,
+                    subdataset=slc_vrt_stack.subdataset,
+                )
 
             run_wrapped_phase_single(
                 vrt_stack=cur_vrt,
