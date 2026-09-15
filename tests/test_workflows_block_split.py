@@ -128,6 +128,87 @@ def test_read_bounds_overlap_by_halo_on_interior_edges(dated_geotiff, tmp_path):
     assert reads[-1].bottom == centrals[-1].bottom
 
 
+def _make_cfg_with_aoi(cslc_path, work_dir, bounds, bounds_epsg):
+    return DisplacementWorkflow(
+        cslc_file_list=[cslc_path],
+        work_directory=work_dir,
+        phase_linking={"half_window": {"y": DEFAULT_HALF_WINDOW_Y, "x": 11}},
+        output_options={
+            "strides": {"y": DEFAULT_STRIDE_Y, "x": 5},
+            "bounds": bounds,
+            "bounds_epsg": bounds_epsg,
+        },
+    )
+
+
+def test_an_area_of_interest_keeps_only_the_blocks_it_touches(dated_geotiff, tmp_path):
+    """Before, ``output_options.bounds`` only cropped the stitched products and
+    every block still phase-linked its full extent. Frame: x 500000-530000,
+    y 3820000-4000000 (6000 rows of 30 m), split in 3 -> 60000 m per block."""
+    # An AOI inside the middle block only, 10 m off the pixel grid on purpose:
+    # the grid is 500000 + 30k in x and 4000000 - 30k in y.
+    aoi = (509010.0, 3904010.0, 515010.0, 3910010.0)
+    cfg = _make_cfg_with_aoi(dated_geotiff, tmp_path, aoi, 32610)
+    halo = _min_halo_rows(cfg)
+    blocks = split_frame_into_blocks(cfg, num_blocks=3)
+
+    assert list(blocks) == ["block_01"]
+    bb = blocks["block_01"]
+    # Snapped outward to whole 30 m pixels of the frame grid.
+    assert bb.central_bounds == Bbox(509000.0, 3904000.0, 515030.0, 3910030.0)
+    # Read region: central plus the halo in both directions.
+    assert bb.read_bounds == Bbox(
+        509000.0 - halo * 30.0, 3904000.0 - halo * 30.0,
+        515030.0 + halo * 30.0, 3910030.0 + halo * 30.0,
+    )
+    assert bb.epsg == 32610
+
+
+def test_an_area_of_interest_spanning_two_blocks_clips_both(dated_geotiff, tmp_path):
+    # Blocks of 3: rows [0,2000) [2000,4000) [4000,6000) -> y edges at
+    # 4000000, 3940000, 3880000, 3820000. Straddle the 3940000 edge with
+    # on-grid rows (4000000 - 30k): 3949990 (k=1667) and 3929980 (k=2334).
+    aoi = (500000.0, 3929980.0, 530000.0, 3949990.0)
+    cfg = _make_cfg_with_aoi(dated_geotiff, tmp_path, aoi, 32610)
+    blocks = split_frame_into_blocks(cfg, num_blocks=3)
+
+    assert list(blocks) == ["block_00", "block_01"]
+    assert blocks["block_00"].central_bounds == Bbox(500000.0, 3940000.0, 530000.0, 3949990.0)
+    assert blocks["block_01"].central_bounds == Bbox(500000.0, 3929980.0, 530000.0, 3940000.0)
+    # Adjacent centrals still share exactly one edge; reads stay inside the frame.
+    assert blocks["block_00"].read_bounds.left == 500000.0
+    assert blocks["block_00"].read_bounds.right == 530000.0
+
+
+def test_an_area_of_interest_in_lon_lat_is_reprojected_to_the_frame(dated_geotiff, tmp_path):
+    from rasterio.warp import transform_bounds
+
+    utm = (509000.0, 3904000.0, 515000.0, 3910000.0)   # on the 30 m grid
+    lonlat = transform_bounds(32610, 4326, *utm)
+    cfg = _make_cfg_with_aoi(dated_geotiff, tmp_path, lonlat, 4326)
+    blocks = split_frame_into_blocks(cfg, num_blocks=3)
+
+    assert list(blocks) == ["block_01"]
+    c = blocks["block_01"].central_bounds
+    # Round-tripping through lon/lat is not exact; snapping outward means the
+    # result contains the original box and is at most one pixel larger a side.
+    assert c.left <= utm[0] and c.bottom <= utm[1] and c.right >= utm[2] and c.top >= utm[3]
+    assert c.left >= utm[0] - 30.0 and c.right <= utm[2] + 30.0
+
+
+def test_an_area_of_interest_applies_to_a_single_block_too(dated_geotiff, tmp_path):
+    aoi = (509000.0, 3904000.0, 515000.0, 3910000.0)   # on the 30 m grid
+    cfg = _make_cfg_with_aoi(dated_geotiff, tmp_path, aoi, 32610)
+    blocks = split_frame_into_blocks(cfg, num_blocks=1)
+    assert blocks["block_00"].central_bounds == Bbox(*aoi)
+
+
+def test_an_area_of_interest_outside_the_frame_is_refused(dated_geotiff, tmp_path):
+    cfg = _make_cfg_with_aoi(dated_geotiff, tmp_path, (600000.0, 3900000.0, 605000.0, 3905000.0), 32610)
+    with pytest.raises(ValueError, match="does not intersect"):
+        split_frame_into_blocks(cfg, num_blocks=3)
+
+
 def test_halo_too_large_raises(tmp_path):
     fn = tmp_path / "20250101_slc.tif"
     _make_geotiff(fn, ny=50)  # tiny frame

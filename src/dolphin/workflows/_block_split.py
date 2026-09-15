@@ -189,10 +189,12 @@ def split_frame_into_blocks(
     xmin, ymax = gt[0], gt[3]
     px_x, px_y = gt[1], abs(gt[5])
     xmax = xmin + nx * px_x
+    frame = Bbox(float(xmin), float(ymax - ny * px_y), float(xmax), float(ymax))
+    aoi = _aoi_in_frame_crs(cfg, epsg, frame, px_x, px_y)
 
     if num_blocks == 1:
-        full = Bbox(float(xmin), float(ymax - ny * px_y), float(xmax), float(ymax))
-        return {"block_00": BlockBounds(full, full, epsg)}
+        blocks = {"block_00": BlockBounds(frame, frame, epsg)}
+        return _clip_blocks_to_aoi(blocks, aoi, frame, halo, px_x, px_y) if aoi else blocks
 
     rows_per = ny // num_blocks
     if rows_per <= 2 * halo:
@@ -242,7 +244,91 @@ def split_frame_into_blocks(
         num_blocks,
         halo,
     )
+    if aoi:
+        blocks = _clip_blocks_to_aoi(blocks, aoi, frame, halo, px_x, px_y)
     return blocks
+
+
+def _aoi_in_frame_crs(
+    cfg: DisplacementWorkflow, epsg: int, frame: Bbox, px_x: float, px_y: float
+) -> Bbox | None:
+    """``output_options.bounds`` in the frame's CRS, snapped out to whole pixels.
+
+    None when no bounds are set, so the whole frame is processed as before.
+    Snapping outward keeps every later crop and mosaic on the input grid.
+    """
+    bounds = cfg.output_options.bounds
+    if bounds is None:
+        return None
+    src_epsg = cfg.output_options.bounds_epsg or 4326
+    if src_epsg != epsg:
+        from rasterio.warp import transform_bounds
+
+        bounds = Bbox(*transform_bounds(src_epsg, epsg, *bounds))
+    import math
+
+    left = frame.left + math.floor((bounds.left - frame.left) / px_x) * px_x
+    right = frame.left + math.ceil((bounds.right - frame.left) / px_x) * px_x
+    top = frame.top - math.floor((frame.top - bounds.top) / px_y) * px_y
+    bottom = frame.top - math.ceil((frame.top - bounds.bottom) / px_y) * px_y
+    return Bbox(
+        max(left, frame.left),
+        max(bottom, frame.bottom),
+        min(right, frame.right),
+        min(top, frame.top),
+    )
+
+
+def _clip_blocks_to_aoi(
+    blocks: dict[str, BlockBounds],
+    aoi: Bbox,
+    frame: Bbox,
+    halo: int,
+    px_x: float,
+    px_y: float,
+) -> dict[str, BlockBounds]:
+    """Keep only the part of each block inside ``aoi``; drop blocks outside it.
+
+    Before this, an area of interest in ``output_options.bounds`` only cropped
+    the *stitched* products: every block still phase-linked its full extent
+    (a 6-date NISAR frame with a 13 x 10 km AOI ran 8 blocks x 100 min and
+    peaked at 234 GiB, then was cropped to the AOI at the end). Each block's
+    central region becomes its intersection with the AOI, and its read
+    region that plus the halo -- in both directions, since the AOI can now
+    cut a block's columns as well as its rows -- clamped to the frame.
+    """
+    kept: dict[str, BlockBounds] = {}
+    for block_id, bb in blocks.items():
+        c = bb.central_bounds
+        central = Bbox(
+            max(c.left, aoi.left),
+            max(c.bottom, aoi.bottom),
+            min(c.right, aoi.right),
+            min(c.top, aoi.top),
+        )
+        if central.left >= central.right or central.bottom >= central.top:
+            continue
+        read = Bbox(
+            max(frame.left, central.left - halo * px_x),
+            max(frame.bottom, central.bottom - halo * px_y),
+            min(frame.right, central.right + halo * px_x),
+            min(frame.top, central.top + halo * px_y),
+        )
+        kept[block_id] = BlockBounds(read, central, bb.epsg)
+    if not kept:
+        msg = (
+            f"output_options.bounds {tuple(aoi)} (EPSG:{next(iter(blocks.values())).epsg})"
+            f" does not intersect the frame {tuple(frame)}; nothing to process."
+        )
+        raise ValueError(msg)
+    logger.info(
+        "Area of interest %s keeps %d of %d azimuth blocks (%s)",
+        tuple(round(v) for v in aoi),
+        len(kept),
+        len(blocks),
+        ", ".join(kept),
+    )
+    return kept
 
 
 def crop_to_central(filename: Filename, central_bounds: Bbox) -> Path:
