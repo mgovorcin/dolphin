@@ -59,6 +59,7 @@ def run_wrapped_phase_single(
     shp_alpha: float = 0.05,
     shp_nslc: Optional[int] = None,
     similarity_nearest_n: int | None = None,
+    similarity_search_radius: int = 7,
     write_closure_phase: bool = True,
     write_crlb: bool = True,
     block_shape: tuple[int, int] = (512, 512),
@@ -387,6 +388,7 @@ def run_wrapped_phase_single(
         num_threads=1,
         add_overviews=False,
         nearest_n=similarity_nearest_n,
+        search_radius=similarity_search_radius,
         block_shape=block_shape,
     )
 
