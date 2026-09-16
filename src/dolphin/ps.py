@@ -46,6 +46,7 @@ def create_ps(
     existing_amp_dispersion_file: Optional[Filename] = None,
     nodata_mask: Optional[np.ndarray] = None,
     update_existing: bool = False,
+    skip_if_exists: bool = False,
     block_shape: tuple[int, int] = (512, 512),
     **tqdm_kwargs,
 ):
@@ -77,6 +78,9 @@ def create_ps(
         data from the current SLC stack.
         If False, simply uses the existing files to create as PS mask.
         Default is False.
+    skip_if_exists : bool, optional
+        If True and all three output files already exist, return immediately
+        without recomputing. Default is False.
     block_shape : tuple[int, int], optional
         The 2D block size to load all bands at a time.
         Default is (512, 512)
@@ -85,6 +89,13 @@ def create_ps(
         See https://tqdm.github.io/docs/tqdm/#tqdm-objects for all options.
 
     """
+    if skip_if_exists and all(
+        Path(f).exists()
+        for f in [output_file, output_amp_mean_file, output_amp_dispersion_file]
+    ):
+        logger.info("PS output files already exist, skipping create_ps.")
+        return
+
     if existing_amp_dispersion_file and existing_amp_mean_file and not update_existing:
         logger.info("Using existing amplitude dispersion file, skipping calculation.")
         # Just use what's there, copy to the expected output locations
