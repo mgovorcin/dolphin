@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import logging
 from collections import deque
-from collections.abc import Callable
+from collections.abc import Callable, Sequence
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from pathlib import Path
@@ -38,6 +38,25 @@ class OutputFile:
     strides: Optional[dict[str, int]] = None
     nbands: int = 1
     nodata: float = 0
+
+
+def _similarity_inputs(
+    phase_linked_slc_files: Sequence[Path], ministack: MiniStackInfo
+) -> list[Path]:
+    """Drop the phase-linking reference SLC from the similarity input list.
+
+    `create_similarities` treats each input as an interferogram formed against a
+    reference date which is *not* itself in the list. That holds once a ministack
+    has compressed SLCs, since `output_reference_idx` then points at one of them.
+    For the first ministack the reference is the first real SLC, so it *is* exported,
+    and its phase is identically zero -- contributing ``cos(0) == 1`` to every pixel
+    pair and biasing the similarity raster upward.
+    """
+    ref_pos = ministack.output_reference_idx - ministack.first_real_slc_idx
+    if not 0 <= ref_pos < len(phase_linked_slc_files):
+        # Reference is a compressed SLC: every exported file is a real interferogram
+        return list(phase_linked_slc_files)
+    return [f for i, f in enumerate(phase_linked_slc_files) if i != ref_pos]
 
 
 @atomic_output(output_arg="output_folder", is_dir=True)
@@ -382,7 +401,7 @@ def run_wrapped_phase_single(
 
     logger.info("Creating similarity raster on outputs")
     similarity.create_similarities(
-        phase_linked_slc_files,
+        _similarity_inputs(phase_linked_slc_files, ministack),
         output_file=output_folder / f"similarity_{start_end}.tif",
         num_threads=1,
         add_overviews=False,
