@@ -351,6 +351,132 @@ def create_similarities(
         create_image_overviews(Path(output_file), resampling=Resampling.AVERAGE)
 
 
+def create_per_date_similarities(
+    slc_file_list: Sequence[PathOrStr],
+    date_strs: Sequence[str],
+    output_dir: PathOrStr,
+    search_radius: int = 7,
+    block_shape: tuple[int, int] = (512, 512),
+    num_threads: int = 5,
+    add_overviews: bool = True,
+    reference_idx: int | None = None,
+) -> list[Path]:
+    """Create one phase similarity raster per acquisition date.
+
+    Where `create_similarities` summarizes a whole ministack into a single raster,
+    this forms, for each date `i`, the interferograms against **every other date**
+    in the stack and computes the spatial median similarity over that subset. The
+    phase of date `i` enters every one of those interferograms, so the resulting
+    raster reflects the quality of that one acquisition.
+
+    This is the per-reference-date decomposition of
+    [@Wang2022AccuratePersistentScatterer]: their Section V-A derives one PS set
+    per choice of reference SLC for the same reason, that noise in the reference
+    image corrupts every interferogram formed from it.
+
+    Parameters
+    ----------
+    slc_file_list : Sequence[PathOrStr]
+        Phase-linked SLC files, in chronological order.
+    date_strs : Sequence[str]
+        Date strings (e.g. ``YYYYMMDD``) parallel to `slc_file_list`, used to name
+        the outputs.
+    output_dir : PathOrStr
+        Directory to write ``similarity_{date}.tif`` into.
+    search_radius : int, optional
+        Maximum radius to search for neighboring pixels, by default 7.
+    block_shape : tuple[int, int], optional
+        Size of blocks to process at one time, by default (512, 512).
+    num_threads : int, optional
+        Number of parallel blocks to process, by default 5.
+    add_overviews : bool, optional
+        Whether to create overviews in each output, by default True.
+    reference_idx : int, optional
+        Index of the phase linking reference date, whose phase is identically zero.
+        Its own raster would be the ordinary single-reference stack similarity
+        rather than an epoch-specific measure, so it is not written. It is still
+        used as a partner for the other dates, where it forms a valid interferogram.
+
+    Returns
+    -------
+    list[Path]
+        The per-date rasters written, in the order of `slc_file_list`.
+
+    Notes
+    -----
+    Only the median summary is provided. The `max` summary of Equation (6) requires
+    a large stack -- the paper suggests ``K > 50`` -- whereas each date here is
+    compared over only a handful of interferograms, where `max` reports high
+    similarity even for fully decorrelated data.
+
+    Pairing each date against all the others, rather than against a fixed number of
+    temporal neighbors, keeps the number of interferograms the same for every date.
+    A nearest-`n` window would leave the first and last dates of the stack with half
+    as many, and a correspondingly different baseline.
+
+    """
+    from dolphin._overviews import Resampling, create_image_overviews
+    from dolphin.io import BackgroundStackWriter, VRTStack, process_blocks
+
+    if len(date_strs) != len(slc_file_list):
+        msg = f"Got {len(slc_file_list)} files but {len(date_strs)} dates"
+        raise ValueError(msg)
+    n_dates = len(slc_file_list)
+    if n_dates < 3:
+        msg = f"Need at least 3 dates for per-date similarity, got {n_dates}"
+        raise ValueError(msg)
+
+    output_dir = Path(output_dir)
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    out_idxs = [i for i in range(n_dates) if i != reference_idx]
+    output_files = [output_dir / f"similarity_{date_strs[i]}.tif" for i in out_idxs]
+    if all(f.exists() for f in output_files):
+        logger.info(f"All {len(output_files)} per-date rasters exist, skipping")
+        return output_files
+
+    def calc_per_date_sim(readers, rows, cols):
+        block = readers[0][:, rows, cols]
+        n_rows, n_cols = block.shape[-2:]
+        out = np.full((len(out_idxs), n_rows, n_cols), np.nan, dtype="float32")
+        if np.sum(block) == 0 or np.isnan(block).all():
+            return out, rows, cols
+        for out_band, i in enumerate(out_idxs):
+            others = [j for j in range(n_dates) if j != i]
+            out[out_band] = median_similarity(
+                ifg_stack=block[[i]] * np.conj(block[others]),
+                search_radius=search_radius,
+            )
+        return out, rows, cols
+
+    reader = VRTStack(
+        [Path(f) for f in slc_file_list], outfile=output_dir / "per_date_inputs.vrt"
+    )
+    writer = BackgroundStackWriter(
+        output_files,
+        like_filename=slc_file_list[0],
+        dtype="float32",
+        driver="GTiff",
+        nodata=np.nan,
+    )
+    process_blocks(
+        [reader],
+        writer,
+        func=calc_per_date_sim,
+        block_shape=block_shape,
+        overlaps=(search_radius, search_radius),
+        num_threads=num_threads,
+    )
+    writer.notify_finished()
+
+    if add_overviews:
+        logger.info("Creating overviews for per-date similarity rasters")
+        for f in output_files:
+            create_image_overviews(f, resampling=Resampling.AVERAGE)
+
+    return output_files
+
+
 def _calc_nearest_diffs(block, incidence_matrix) -> np.ndarray:
     # Multiply the single-ref data by tall and skinny A matrix
     # to give the nearest-n differences

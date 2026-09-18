@@ -1,7 +1,10 @@
+from pathlib import Path
+
 import numpy as np
 import pytest
 
 from dolphin import similarity
+from dolphin.io import load_gdal
 
 # Dataset has no geotransform, gcps, or rpcs. The identity matrix will be returned.
 pytestmark = pytest.mark.filterwarnings(
@@ -125,3 +128,137 @@ class TestStackSimilarity:
         similarity.create_similarities(
             slc_file_list, output_file=outfile, num_threads=1, block_shape=(64, 64)
         )
+
+
+class TestPerDateSimilarities:
+    """One similarity raster per acquisition date."""
+
+    @staticmethod
+    def _write(tmp_path, stack, dates):
+        from osgeo import gdal
+
+        files = []
+        for arr, d in zip(stack, dates, strict=True):
+            fname = str(tmp_path / f"{d}.slc.tif")
+            ds = gdal.GetDriverByName("GTiff").Create(
+                fname, arr.shape[1], arr.shape[0], 1, gdal.GDT_CFloat32
+            )
+            ds.GetRasterBand(1).WriteArray(arr.astype("complex64"))
+            ds = None
+            files.append(Path(fname))
+        return files
+
+    @staticmethod
+    def _medians(files):
+        return np.array(
+            [np.nanmedian(load_gdal(f, masked=True).filled(np.nan)) for f in files]
+        )
+
+    @pytest.fixture
+    def dates(self):
+        return [f"2020{m:02d}01" for m in range(1, 8)]
+
+    @pytest.fixture
+    def coherent_stack(self):
+        """Seven dates of a smooth ramp plus light noise: every epoch is good."""
+        rng = np.random.default_rng(0)
+        yy, xx = np.mgrid[:60, :60]
+        phase = np.array([0.02 * t * (xx + yy) for t in range(7)])
+        return np.exp(1j * (phase + 0.2 * rng.standard_normal(phase.shape)))
+
+    def test_writes_one_raster_per_date(self, tmp_path, coherent_stack, dates):
+        files = self._write(tmp_path, coherent_stack, dates)
+        out = similarity.create_per_date_similarities(
+            files,
+            dates,
+            tmp_path / "per_date",
+            search_radius=3,
+            block_shape=(64, 64),
+            num_threads=1,
+            add_overviews=False,
+        )
+        assert [p.name for p in out] == [f"similarity_{d}.tif" for d in dates]
+        assert all(p.exists() for p in out)
+
+    def test_reference_date_gets_no_raster(self, tmp_path, coherent_stack, dates):
+        files = self._write(tmp_path, coherent_stack, dates)
+        out = similarity.create_per_date_similarities(
+            files,
+            dates,
+            tmp_path / "per_date",
+            search_radius=3,
+            block_shape=(64, 64),
+            num_threads=1,
+            add_overviews=False,
+            reference_idx=0,
+        )
+        assert [p.name for p in out] == [f"similarity_{d}.tif" for d in dates[1:]]
+
+    def test_a_decorrelated_epoch_is_isolated(self, tmp_path, coherent_stack, dates):
+        """The point of the product: one bad date shows up in its own raster only."""
+        rng = np.random.default_rng(1)
+        stack = coherent_stack.copy()
+        bad = 3
+        stack[bad] = np.exp(1j * rng.uniform(-np.pi, np.pi, stack.shape[-2:]))
+        files = self._write(tmp_path, stack, dates)
+
+        out = similarity.create_per_date_similarities(
+            files,
+            dates,
+            tmp_path / "per_date",
+            search_radius=3,
+            block_shape=(64, 64),
+            num_threads=1,
+            add_overviews=False,
+        )
+        medians = self._medians(out)
+        good = np.delete(medians, bad)
+        assert medians[bad] < good.min() - 0.2, f"{medians = }"
+        # The remaining epochs are barely affected by their bad neighbor
+        assert good.std() < 0.1, f"{good = }"
+
+    def test_every_date_has_the_same_number_of_partners(
+        self, tmp_path, coherent_stack, dates
+    ):
+        """No epoch is weighted differently, including the first and last."""
+        files = self._write(tmp_path, coherent_stack, dates)
+        out = similarity.create_per_date_similarities(
+            files,
+            dates,
+            tmp_path / "per_date",
+            search_radius=3,
+            block_shape=(64, 64),
+            num_threads=1,
+            add_overviews=False,
+        )
+        assert self._medians(out).std() < 0.05
+
+    def test_blockwise_result_matches_a_single_block(
+        self, tmp_path, coherent_stack, dates
+    ):
+        files = self._write(tmp_path, coherent_stack, dates)
+        kwargs = {"search_radius": 3, "num_threads": 1, "add_overviews": False}
+        many = similarity.create_per_date_similarities(
+            files, dates, tmp_path / "many", block_shape=(16, 16), **kwargs
+        )
+        one = similarity.create_per_date_similarities(
+            files, dates, tmp_path / "one", block_shape=(64, 64), **kwargs
+        )
+        for a, b in zip(many, one, strict=True):
+            np.testing.assert_allclose(
+                load_gdal(a), load_gdal(b), atol=1e-6, equal_nan=True
+            )
+
+    def test_mismatched_date_count_is_rejected(self, tmp_path, coherent_stack, dates):
+        files = self._write(tmp_path, coherent_stack, dates)
+        with pytest.raises(ValueError, match="Got 7 files but 6 dates"):
+            similarity.create_per_date_similarities(
+                files, dates[:-1], tmp_path / "per_date"
+            )
+
+    def test_too_short_a_stack_is_rejected(self, tmp_path, coherent_stack, dates):
+        files = self._write(tmp_path, coherent_stack[:2], dates[:2])
+        with pytest.raises(ValueError, match="at least 3 dates"):
+            similarity.create_per_date_similarities(
+                files, dates[:2], tmp_path / "per_date"
+            )
