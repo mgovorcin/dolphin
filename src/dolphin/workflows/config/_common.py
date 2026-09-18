@@ -169,6 +169,16 @@ class PhaseLinkingOptions(BaseModel, extra="forbid"):
             " the coherence matrix."
         ),
     )
+    write_per_date_similarity: bool = Field(
+        False,
+        description=(
+            "Write one phase similarity raster per acquisition date, alongside the"
+            " single raster covering the whole ministack. Each date is compared"
+            " against all the others, so a single poor acquisition can be told apart"
+            " from a stack which is poor throughout. Written into a"
+            " `per_date_similarity` subfolder of each ministack's output folder."
+        ),
+    )
 
 
 class InterferogramNetwork(BaseModel, extra="forbid"):

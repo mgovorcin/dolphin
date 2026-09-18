@@ -59,6 +59,7 @@ def run_wrapped_phase_single(
     shp_alpha: float = 0.05,
     shp_nslc: Optional[int] = None,
     similarity_nearest_n: int | None = None,
+    write_per_date_similarity: bool = False,
     write_closure_phase: bool = True,
     write_crlb: bool = True,
     block_shape: tuple[int, int] = (512, 512),
@@ -389,6 +390,22 @@ def run_wrapped_phase_single(
         nearest_n=similarity_nearest_n,
         block_shape=block_shape,
     )
+
+    if write_per_date_similarity:
+        logger.info("Creating per-date similarity rasters")
+        # The output reference is only among these files for a ministack with no
+        # compressed SLCs; otherwise it is a compressed SLC and none of them is
+        # the zero-phase reference.
+        ref_pos = ministack.output_reference_idx - ministack.first_real_slc_idx
+        similarity.create_per_date_similarities(
+            phase_linked_slc_files,
+            date_strs=[f.stem.split(".")[0] for f in phase_linked_slc_files],
+            output_dir=output_folder / "per_date_similarity",
+            num_threads=1,
+            add_overviews=False,
+            block_shape=block_shape,
+            reference_idx=ref_pos if ref_pos >= 0 else None,
+        )
 
     if write_crlb:
         logger.info("Repacking CRLB files for more compression")
