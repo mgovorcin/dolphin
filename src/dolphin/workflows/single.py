@@ -388,6 +388,9 @@ def run_wrapped_phase_single(
         add_overviews=False,
         nearest_n=similarity_nearest_n,
         block_shape=block_shape,
+        # NOTE: `mask_file` is at the input resolution, while these outputs are on
+        # the strided grid, so it cannot be passed straight through. Wiring a
+        # decimated water mask through is left for a follow-on change.
     )
 
     if write_crlb:

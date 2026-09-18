@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import logging
 from pathlib import Path
-from typing import Callable, Literal, Sequence
+from typing import Any, Callable, Literal, Sequence
 
 import numba
 import numpy as np
@@ -109,6 +109,10 @@ def _create_loop_and_run(
     out_similarity = np.full((rows, cols), fill_value=np.nan, dtype="float32")
     if mask is None:
         mask = np.ones((rows, cols), dtype="bool")
+    else:
+        # Copy: the caller's array must not pick up this stack's invalid pixels,
+        # which matters once the same mask is reused across blocks.
+        mask = np.asarray(mask, dtype="bool").copy()
     mask[invalid_mask] = False
 
     if mask.shape != (rows, cols):
@@ -264,6 +268,7 @@ def create_similarities(
     num_threads: int = 5,
     add_overviews: bool = True,
     nearest_n: int | None = None,
+    mask_file: PathOrStr | None = None,
 ):
     """Create a similarity raster from as stack of ifg files.
 
@@ -287,10 +292,24 @@ def create_similarities(
         Whether to create overviews in `output_file` by default True
     nearest_n : int, optional
         If provided, reform the nearest N interferograms before computing similarity.
+    mask_file : PathOrStr, optional
+        Raster of valid pixels, 1 for good data and 0 to ignore (the convention of
+        the workflow's `mask_file`, which is typically a water mask). Must be on the
+        same grid as `ifg_file_list` -- note that the workflow's own `mask_file` is at
+        the *input* resolution, so a strided run needs a decimated copy. Masked pixels
+        get no similarity of their own and are skipped when summarizing a
+        neighborhood, so a pixel near a coastline is compared only against land.
+        Without it, decorrelated water inside the search radius drags the value of
+        an otherwise good pixel down.
 
     """
     from dolphin._overviews import Resampling, create_image_overviews
-    from dolphin.io import BackgroundRasterWriter, VRTStack, process_blocks
+    from dolphin.io import (
+        BackgroundRasterWriter,
+        RasterReader,
+        VRTStack,
+        process_blocks,
+    )
     from dolphin.timeseries import get_incidence_matrix
 
     if Path(output_file).exists():
@@ -322,12 +341,29 @@ def create_similarities(
         if incidence_matrix is not None:
             block = _calc_nearest_diffs(block, incidence_matrix)
 
-        out_avg = sim_function(ifg_stack=block, search_radius=search_radius)
+        mask = None
+        if len(readers) > 1:
+            mask = np.asarray(readers[1][rows, cols]).astype(bool)
+
+        out_avg = sim_function(ifg_stack=block, search_radius=search_radius, mask=mask)
         logger.debug(f"{rows = }, {cols = }, {block.shape = }, {out_avg.shape = }")
         return out_avg, rows, cols
 
     out_dir = Path(output_file).parent
     reader = VRTStack(ifg_file_list, outfile=out_dir / "sim_inputs.vrt")
+    # Heterogeneous on purpose: the interferograms are a 3D stack reader, the
+    # optional mask a 2D raster read with the same block indices.
+    readers: list[Any] = [reader]
+    if mask_file is not None:
+        mask_reader = RasterReader.from_file(mask_file, keepdims=False)
+        if tuple(mask_reader.shape[-2:]) != tuple(reader.shape[-2:]):
+            msg = (
+                f"Mask {mask_file} has shape {tuple(mask_reader.shape[-2:])}, but the"
+                f" interferograms are {tuple(reader.shape[-2:])}. The mask must be on"
+                " the same grid; a strided workflow needs a decimated copy."
+            )
+            raise ValueError(msg)
+        readers.append(mask_reader)
 
     writer = BackgroundRasterWriter(
         output_file,
@@ -337,7 +373,7 @@ def create_similarities(
         nodata=np.nan,
     )
     process_blocks(
-        [reader],
+        readers,
         writer,
         func=calc_sim,
         block_shape=block_shape,
