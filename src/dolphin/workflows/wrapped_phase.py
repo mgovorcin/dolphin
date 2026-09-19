@@ -233,6 +233,7 @@ def run(
             temp_coh_files,
             shp_count_files,
             similarity_files,
+            _per_date_similarity_files,
         ) = sequential.run_wrapped_phase_sequential(
             slc_vrt_stack=vrt_stack,
             output_folder=pl_path,
@@ -258,6 +259,7 @@ def run(
             # The water mask, not the nodata mask built above: it refines
             # the similarity layer without stopping phase linking.
             similarity_mask_file=cfg.mask_file,
+            write_per_date_similarity=cfg.phase_linking.write_per_date_similarity,
             cslc_date_fmt=cfg.input_options.cslc_date_fmt,
             write_crlb=cfg.phase_linking.write_crlb,
             write_closure_phase=cfg.phase_linking.write_closure_phase,

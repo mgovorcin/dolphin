@@ -102,3 +102,43 @@ def test_sequential_ministack_sizes(tmp_path, slc_file_list_nc, ministack_size):
         shp_alpha=None,
         shp_nslc=None,
     )
+
+
+def test_per_date_similarity_across_ministacks(tmp_path, slc_file_list):
+    """Per-date rasters stay in their ministack's subfolder and are all returned.
+
+    They are a many-files-per-ministack output, so they follow `crlb/` and
+    `closure_phases/` rather than the single-file outputs that get moved up.
+    """
+    vrt_stack = _readers.VRTStack(slc_file_list, outfile=tmp_path / "slc_stack.vrt")
+    n_slc, rows, cols = vrt_stack.shape
+    ms_size = 5
+    assert n_slc > ms_size, "need more than one ministack for this test"
+
+    output_folder = tmp_path / "sequential"
+    result = sequential.run_wrapped_phase_sequential(
+        slc_vrt_stack=vrt_stack,
+        output_folder=output_folder,
+        ministack_size=ms_size,
+        half_window={"x": cols // 2, "y": rows // 2},
+        strides={"x": 1, "y": 1},
+        ps_mask_file=None,
+        amp_mean_file=None,
+        amp_dispersion_file=None,
+        shp_method="rect",
+        shp_alpha=None,
+        shp_nslc=None,
+        write_per_date_similarity=True,
+    )
+    per_date = result[-1]
+    assert per_date, "no per-date rasters were collected"
+    # Every one lives in a per_date_similarity subfolder of a ministack folder
+    assert all(p.parent.name == "per_date_similarity" for p in per_date)
+    assert all(p.exists() for p in per_date)
+    # More than one ministack contributed
+    assert len({p.parent.parent for p in per_date}) > 1
+    # Every date is covered at most once, and the moved-up ministack rasters are
+    # not confused with them
+    names = [p.name for p in per_date]
+    assert len(names) == len(set(names))
+    assert not list(output_folder.glob("per_date_similarity"))

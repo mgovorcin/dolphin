@@ -47,6 +47,7 @@ def run_wrapped_phase_sequential(
     zero_correlation_threshold: float = 0.0,
     similarity_nearest_n: int | None = None,
     similarity_mask_file: Optional[Filename] = None,
+    write_per_date_similarity: bool = False,
     compressed_slc_plan: CompressedSlcPlan = CompressedSlcPlan.ALWAYS_FIRST,
     max_num_compressed: int = 100,
     output_reference_idx: int | None = None,
@@ -59,7 +60,14 @@ def run_wrapped_phase_sequential(
     max_workers: int = 1,
     **tqdm_kwargs,
 ) -> tuple[
-    list[Path], list[Path], list[Path], list[Path], list[Path], list[Path], list[Path]
+    list[Path],
+    list[Path],
+    list[Path],
+    list[Path],
+    list[Path],
+    list[Path],
+    list[Path],
+    list[Path],
 ]:
     """Estimate wrapped phase using batches of ministacks."""
     if strides is None:
@@ -95,6 +103,9 @@ def run_wrapped_phase_sequential(
     output_slc_files: list[Path] = []
     crlb_files: list[Path] = []
     closure_phase_files: list[Path] = []
+    # Like `crlb` and `closure_phases`: many files per ministack, kept in their own
+    # subfolder rather than moved up next to the single-file-per-ministack outputs.
+    per_date_similarity_files: list[Path] = []
     temp_coh_files: list[Path] = []
     similarity_files: list[Path] = []
     shp_count_files: list[Path] = []
@@ -140,6 +151,7 @@ def run_wrapped_phase_sequential(
                 shp_nslc=shp_nslc,
                 similarity_nearest_n=similarity_nearest_n,
                 similarity_mask_file=similarity_mask_file,
+                write_per_date_similarity=write_per_date_similarity,
                 write_closure_phase=write_closure_phase,
                 write_crlb=write_crlb,
                 block_shape=block_shape,
@@ -156,6 +168,7 @@ def run_wrapped_phase_sequential(
             temp_coh_file,
             similarity_file,
             shp_count_file,
+            cur_per_date_similarity_files,
         ) = _get_outputs_from_folder(cur_output_folder)
         crlb_files.extend(cur_crlb_files)
         closure_phase_files.extend(cur_closure_phase_files)
@@ -163,6 +176,7 @@ def run_wrapped_phase_sequential(
         temp_coh_files.append(temp_coh_file)
         similarity_files.append(similarity_file)
         shp_count_files.append(shp_count_file)
+        per_date_similarity_files.extend(cur_per_date_similarity_files)
 
     ##############################################
     # Move the per-ministack files into the `output_folder`
@@ -226,12 +240,13 @@ def run_wrapped_phase_sequential(
         temp_coh_files,
         shp_count_files,
         similarity_files,
+        per_date_similarity_files,
     )
 
 
 def _get_outputs_from_folder(
     output_folder: Path,
-) -> tuple[list[Path], list[Path], list[Path], Path, Path, Path, Path]:
+) -> tuple[list[Path], list[Path], list[Path], Path, Path, Path, Path, list[Path]]:
     cur_output_files = sorted(output_folder.glob("2*.slc.tif"))
 
     cur_comp_slc_file = next(output_folder.glob("compressed_*"))
@@ -240,6 +255,9 @@ def _get_outputs_from_folder(
     shp_count_file = next(output_folder.glob("shp_counts_*"))
     crlb_files = sorted(output_folder.glob("crlb/crlb*tif"))
     closure_phase_files = sorted(output_folder.glob("closure_phases/closure_phase*tif"))
+    per_date_similarity_files = sorted(
+        output_folder.glob("per_date_similarity/similarity_*tif")
+    )
 
     return (
         cur_output_files,
@@ -249,6 +267,7 @@ def _get_outputs_from_folder(
         temp_coh_file,
         similarity_file,
         shp_count_file,
+        per_date_similarity_files,
     )
 
 
