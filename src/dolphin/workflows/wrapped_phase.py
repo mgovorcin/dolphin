@@ -233,6 +233,7 @@ def run(
             temp_coh_files,
             shp_count_files,
             similarity_files,
+            _per_date_similarity_files,
         ) = sequential.run_wrapped_phase_sequential(
             slc_vrt_stack=vrt_stack,
             output_folder=pl_path,
