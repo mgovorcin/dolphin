@@ -22,6 +22,7 @@ from dolphin.io import BlockIndices, EagerLoader, StridedBlockManager, VRTStack
 from dolphin.phase_link import PhaseLinkRuntimeError, compress, run_phase_linking
 from dolphin.ps import calc_ps_block
 from dolphin.stack import MiniStackInfo
+from dolphin.stitching import _get_matching_raster
 from dolphin.utils import DummyProcessPoolExecutor, grow_nodata_region
 
 from .config import ShpMethod
@@ -78,6 +79,7 @@ def run_wrapped_phase_single(
     shp_alpha: float = 0.05,
     shp_nslc: Optional[int] = None,
     similarity_nearest_n: int | None = None,
+    similarity_mask_file: Optional[Filename] = None,
     write_closure_phase: bool = True,
     write_crlb: bool = True,
     block_shape: tuple[int, int] = (512, 512),
@@ -407,6 +409,19 @@ def run_wrapped_phase_single(
         add_overviews=False,
         nearest_n=similarity_nearest_n,
         block_shape=block_shape,
+        # A water mask arrives on its own grid -- often lat/lon, and never the
+        # strided output grid -- so warp it here, the way `unwrapping.run` does.
+        # This is deliberately *not* the `mask_file` nodata mask above: water has
+        # signal, it is just decorrelated, so it should not stop phase linking.
+        mask_file=(
+            _get_matching_raster(
+                input_file=Path(similarity_mask_file),
+                output_dir=output_folder,
+                match_file=phase_linked_slc_files[0],
+            )
+            if similarity_mask_file is not None
+            else None
+        ),
     )
 
     if write_crlb:
