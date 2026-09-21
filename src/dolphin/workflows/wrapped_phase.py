@@ -491,6 +491,20 @@ def create_ifgs(
             raise ValueError(msg)
         ifg_file_list = cast(list[Path], [ifg.path for ifg in network.ifg_list])
         assert all(p is not None for p in ifg_file_list)
+        # single_ref_ifgs maps 1:1 onto phase_linked_slcs only without an extra
+        # reference date, which forward mode never sets.
+        if (
+            interferogram_network.include_compressed_reference
+            and extra_reference_date is None
+        ):
+            ifg_file_list.extend(
+                compressed_reference_ifgs(
+                    interferogram_network.indexes,
+                    reference_date,
+                    secondary_dates,
+                    single_ref_ifgs,
+                )
+            )
 
     if interferogram_network.max_bandwidth is not None:
         max_b = interferogram_network.max_bandwidth
@@ -616,3 +630,46 @@ def _is_single_reference_network(
         and ifg_network.max_bandwidth is None
         and ifg_network.max_temporal_baseline is None
     )
+
+
+def _as_date(d) -> datetime.date:
+    return d.date() if isinstance(d, datetime.datetime) else d
+
+
+def compressed_reference_ifgs(
+    indexes: Sequence[tuple[int, int]],
+    reference_date: datetime.datetime,
+    secondary_dates: Sequence[datetime.datetime],
+    single_ref_ifgs: Sequence[Path],
+) -> list[Path]:
+    """The (reference epoch -> real date) ifgs a manual network needs.
+
+    A manual-index network addresses the phase-linked (real-date) list only, so
+    the compressed SLC's reference epoch is never one of its nodes. That is fine
+    while the epoch lies before the window the indexes span. When it falls
+    inside -- e.g. it is the second-to-last date, which happens in forward mode
+    whenever the newest compressed SLC was written by the previous run -- the
+    interval from it to the next date has no interferogram at all, and the
+    inversion can only bridge it indirectly.
+
+    The pairs are already on disk: every phase-linked output is referenced to
+    the reference epoch, so ``single_ref_ifgs[i]`` *is* (reference ->
+    ``secondary_dates[i]``). This keeps the ones whose secondary falls inside
+    the window and after the reference. Only negative (count-from-the-end)
+    indexes are understood; anything else returns nothing rather than guessing
+    at what window was meant.
+    """
+    flat = [i for pair in indexes for i in pair]
+    if not flat or any(i >= 0 for i in flat):
+        return []
+    depth = max(abs(i) for i in flat)
+    ref = _as_date(reference_date)
+    dates = [_as_date(d) for d in secondary_dates]
+    window = sorted({*dates, ref})[-depth:]
+    if ref not in window:
+        return []
+    return [
+        p
+        for d, p in zip(dates, single_ref_ifgs, strict=True)
+        if d in window and d > ref
+    ]

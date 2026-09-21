@@ -217,6 +217,17 @@ class InterferogramNetwork(BaseModel, extra="forbid"):
             " interferograms to form."
         ),
     )
+    include_compressed_reference: bool = Field(
+        False,
+        description=(
+            "With a manual-index network and compressed SLC inputs: also keep the"
+            " interferograms from the compressed SLC's reference epoch to the real"
+            " dates after it, whenever that epoch falls inside the window the"
+            " indexes span. Without this the manual network is real-dates only, so"
+            " when the reference epoch is the second-to-last date no interferogram"
+            " spans the last interval."
+        ),
+    )
 
 
 class TimeseriesOptions(BaseModel, extra="forbid"):
