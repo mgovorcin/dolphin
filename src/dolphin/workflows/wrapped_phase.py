@@ -299,7 +299,17 @@ def run(
         """Get the base phase of either real of compressed slcs."""
         return get_dates(filename, fmt=cfg.input_options.cslc_date_fmt)[0]
 
-    reference_date = [base_phase_date(f) for f in input_file_list][ref_idx]
+    # `ref_idx` indexes the MINISTACK, where the planner puts every compressed
+    # SLC first. Applying it to the date-sorted input list gives a different
+    # file whenever a compressed SLC sorts among the real dates, which is legal
+    # in forward mode -- the label then names a real date and every ifg built
+    # from it is misnamed. Index the compressed files in the same order the
+    # ministack holds them.
+    _compressed = [f for f, c in zip(input_file_list, is_compressed) if c]
+    if _compressed and ref_idx < len(_compressed):
+        reference_date = base_phase_date(_compressed[ref_idx])
+    else:
+        reference_date = [base_phase_date(f) for f in input_file_list][ref_idx]
 
     # TODO: remove this bad back to get around spurt's required input
     # Reading direct nearest-3 ifgs is not working due to some slicing problem
