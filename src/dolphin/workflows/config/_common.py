@@ -169,6 +169,16 @@ class PhaseLinkingOptions(BaseModel, extra="forbid"):
             " the coherence matrix."
         ),
     )
+    similarity_mask_file: Optional[Path] = Field(
+        None,
+        description=(
+            "Water mask for the phase similarity layer (0 = water, 1 = land, uint8),"
+            " applied only to the neighborhood averaging, not to phase linking. Use an"
+            " unbuffered coastline here: `mask_file` is often buffered to keep"
+            " near-shore pixels in processing, which lets water back into the"
+            " similarity windows. If None, `mask_file` is used."
+        ),
+    )
 
 
 class InterferogramNetwork(BaseModel, extra="forbid"):

@@ -318,3 +318,53 @@ def test_displacement_run_different_epsg(opera_slc_files: list[Path], tmpdir):
                 assert get_raster_crs(p).to_epsg() == 32606
         assert get_raster_crs(paths.stitched_ps_file).to_epsg() == 32606
         assert get_raster_crs(paths.stitched_amp_dispersion_file).to_epsg() == 32606
+
+
+class _StopAfterCapture(Exception):
+    pass
+
+
+@pytest.mark.parametrize("set_similarity_mask", [False, True])
+def test_similarity_mask_file_falls_back_to_mask_file(
+    opera_slc_files: list[Path], tmp_path, monkeypatch, set_similarity_mask: bool
+):
+    """`phase_linking.similarity_mask_file` wins; unset, `mask_file` is used.
+
+    disp-s1 hands dolphin a coastline buffered by 1 km as `mask_file`, so near-shore
+    pixels stay in processing. That buffer lets water back into the similarity
+    windows, so the similarity layer can take its own, unbuffered mask.
+    """
+    import numpy as np
+
+    from dolphin import io
+    from dolphin.workflows import sequential, wrapped_phase
+
+    like = io.format_nc_filename(opera_slc_files[0], "/data/VV")
+    rows, cols = io.get_raster_xysize(like)[::-1]
+    buffered, unbuffered = tmp_path / "buffered.tif", tmp_path / "unbuffered.tif"
+    for p in (buffered, unbuffered):
+        io.write_arr(
+            arr=np.ones((rows, cols), dtype="uint8"), output_name=p, like_filename=like
+        )
+
+    captured: dict[str, object] = {}
+
+    def fake_sequential(*args, **kwargs):
+        captured["similarity_mask_file"] = kwargs.get("similarity_mask_file")
+        raise _StopAfterCapture
+
+    monkeypatch.setattr(sequential, "run_wrapped_phase_sequential", fake_sequential)
+    monkeypatch.chdir(tmp_path)
+    cfg = config.DisplacementWorkflow(
+        cslc_file_list=opera_slc_files,
+        input_options={"subdataset": "/data/VV"},
+        mask_file=buffered,
+        phase_linking={
+            "ministack_size": 500,
+            "similarity_mask_file": unbuffered if set_similarity_mask else None,
+        },
+    )
+    with pytest.raises(_StopAfterCapture):
+        wrapped_phase.run(cfg)
+    expected = unbuffered if set_similarity_mask else buffered
+    assert Path(captured["similarity_mask_file"]).name == expected.name
