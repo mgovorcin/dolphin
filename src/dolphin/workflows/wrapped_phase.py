@@ -258,7 +258,9 @@ def run(
             similarity_nearest_n=similarity_nearest_n,
             # The water mask, not the nodata mask built above: it refines
             # the similarity layer without stopping phase linking.
-            similarity_mask_file=cfg.mask_file,
+            similarity_mask_file=(
+                cfg.phase_linking.similarity_mask_file or cfg.mask_file
+            ),
             write_per_date_similarity=cfg.phase_linking.write_per_date_similarity,
             cslc_date_fmt=cfg.input_options.cslc_date_fmt,
             write_crlb=cfg.phase_linking.write_crlb,
