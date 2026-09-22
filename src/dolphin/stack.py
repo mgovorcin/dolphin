@@ -487,15 +487,27 @@ class MiniStackPlanner(BaseStack):
             # TODO: will we ever actually need to read the old metadata here?
             compressed_slc_infos.append(CompressedSlcInfo.from_filename(f))
 
-        # Solve each ministack using current chunk (and the previous compressed SLCs)
-        ministack_starts = range(
-            self.first_real_slc_idx, len(self.file_list), ministack_size
-        )
+        # Solve each ministack using current chunk (and the previous compressed SLCs).
+        #
+        # Chunk the REAL SLCs by their flag, not by position. Slicing from
+        # `first_real_slc_idx` to the end assumes every compressed SLC sits in a
+        # contiguous block at the front of the date-sorted list. That holds when
+        # each one's reference precedes all the real dates, but not when a
+        # compressed SLC is referenced to a date among them -- which DISP-S1's
+        # forward mode permits (its 1002 check compares against the NEWEST real
+        # date). Such a file falls inside the slice as well as being prepended
+        # below, so it entered the ministack twice: two identical columns in the
+        # covariance, and a phase-linked output named for the real acquisition
+        # it had displaced.
+        real_positions = [i for i, c in enumerate(self.is_compressed) if not c]
+        if not real_positions:
+            msg = "No real SLCs to plan a ministack from"
+            raise ValueError(msg)
 
-        for full_stack_idx in ministack_starts:
-            cur_slice = slice(full_stack_idx, full_stack_idx + ministack_size)
-            cur_files = list(self.file_list[cur_slice]).copy()
-            cur_dates = list(self.dates[cur_slice]).copy()
+        for chunk_start in range(0, len(real_positions), ministack_size):
+            idxs = real_positions[chunk_start : chunk_start + ministack_size]
+            cur_files = [self.file_list[i] for i in idxs]
+            cur_dates = [self.dates[i] for i in idxs]
 
             # Read compressed*.tif files and if they do not exist use the compressed*.h5
             comp_slc_files = [c.path for c in compressed_slc_infos]
@@ -509,9 +521,8 @@ class MiniStackPlanner(BaseStack):
             ] + cur_dates
 
             num_ccslc = len(cur_comp_slc_files)
-            combined_is_compressed = num_ccslc * [True] + list(
-                self.is_compressed[cur_slice]
-            )
+            # `cur_files` is now real by construction.
+            combined_is_compressed = num_ccslc * [True] + len(cur_files) * [False]
 
             # Make the current ministack output folder using the start/end dates
             new_date_str = format_dates(
