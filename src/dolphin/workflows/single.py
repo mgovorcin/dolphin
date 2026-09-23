@@ -403,6 +403,17 @@ def run_wrapped_phase_single(
     io.repack_rasters(phase_linked_slc_files, keep_bits=12)
 
     logger.info("Creating similarity raster on outputs")
+    # Warped once here and reused by the per-date rasters below, so both layers see
+    # exactly the same water.
+    warped_similarity_mask = (
+        _get_matching_raster(
+            input_file=Path(similarity_mask_file),
+            output_dir=output_folder,
+            match_file=phase_linked_slc_files[0],
+        )
+        if similarity_mask_file is not None
+        else None
+    )
     similarity.create_similarities(
         _similarity_inputs(phase_linked_slc_files, ministack),
         output_file=output_folder / f"similarity_{start_end}.tif",
@@ -414,15 +425,7 @@ def run_wrapped_phase_single(
         # strided output grid -- so warp it here, the way `unwrapping.run` does.
         # This is deliberately *not* the `mask_file` nodata mask above: water has
         # signal, it is just decorrelated, so it should not stop phase linking.
-        mask_file=(
-            _get_matching_raster(
-                input_file=Path(similarity_mask_file),
-                output_dir=output_folder,
-                match_file=phase_linked_slc_files[0],
-            )
-            if similarity_mask_file is not None
-            else None
-        ),
+        mask_file=warped_similarity_mask,
     )
 
     if write_per_date_similarity:
@@ -439,6 +442,7 @@ def run_wrapped_phase_single(
             add_overviews=False,
             block_shape=block_shape,
             reference_idx=ref_pos if ref_pos >= 0 else None,
+            mask_file=warped_similarity_mask,
         )
 
     if write_crlb:

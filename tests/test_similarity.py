@@ -2,9 +2,10 @@ from pathlib import Path
 
 import numpy as np
 import pytest
+from scipy.ndimage import distance_transform_edt
 
 from dolphin import similarity
-from dolphin.io import load_gdal
+from dolphin.io import load_gdal, write_arr
 
 # Dataset has no geotransform, gcps, or rpcs. The identity matrix will be returned.
 pytestmark = pytest.mark.filterwarnings(
@@ -467,4 +468,98 @@ class TestPerDateSimilarities:
         with pytest.raises(ValueError, match="at least 3 dates"):
             similarity.create_per_date_similarities(
                 files, dates[:2], tmp_path / "per_date"
+            )
+
+
+class TestPerDateSimilarityMasking:
+    """The per-date rasters take the same water mask as the ministack raster.
+
+    Without it the two layers disagree about water: the ministack raster leaves it
+    empty while every per-date raster still scores it, so aggregating the epochs
+    puts water back into a layer that had excluded it.
+    """
+
+    @pytest.fixture
+    def slc_stack_files(self, tmp_path):
+        shape = (5, 60, 60)
+        rng = np.random.default_rng(42)
+        stack = np.exp(1j * rng.normal(size=shape)).astype("complex64")
+        files = []
+        for i in range(shape[0]):
+            f = tmp_path / f"2020010{i + 1}.slc.tif"
+            write_arr(arr=stack[i], output_name=f)
+            files.append(f)
+        return files
+
+    def _mask(self, tmp_path, like, water_cols=slice(0, 30)):
+        arr = np.ones((60, 60), dtype="uint8")
+        arr[:, water_cols] = 0
+        f = tmp_path / "water.tif"
+        write_arr(arr=arr, output_name=f, like_filename=like, dtype="uint8")
+        return f
+
+    def test_masked_pixels_get_no_value(self, tmp_path, slc_stack_files):
+        mask_file = self._mask(tmp_path, slc_stack_files[0])
+        water = load_gdal(mask_file) == 0
+
+        out = similarity.create_per_date_similarities(
+            slc_stack_files,
+            date_strs=[f.stem.split(".")[0] for f in slc_stack_files],
+            output_dir=tmp_path / "masked",
+            search_radius=3,
+            num_threads=1,
+            add_overviews=False,
+            mask_file=mask_file,
+        )
+        assert len(out) == len(slc_stack_files)
+        for f in out:
+            arr = load_gdal(f, masked=True).filled(np.nan)
+            assert np.isnan(arr[water]).all()
+            assert np.isfinite(arr[~water]).any()
+
+    def test_land_values_change_only_within_the_search_radius(
+        self, tmp_path, slc_stack_files
+    ):
+        """Same confinement guarantee as the ministack raster."""
+        mask_file = self._mask(tmp_path, slc_stack_files[0])
+        water = load_gdal(mask_file) == 0
+        radius = 3
+        kwargs = {
+            "date_strs": [f.stem.split(".")[0] for f in slc_stack_files],
+            "search_radius": radius,
+            "num_threads": 1,
+            "add_overviews": False,
+        }
+        un = similarity.create_per_date_similarities(
+            slc_stack_files, output_dir=tmp_path / "unmasked", **kwargs
+        )
+        ma = similarity.create_per_date_similarities(
+            slc_stack_files,
+            output_dir=tmp_path / "masked",
+            mask_file=mask_file,
+            **kwargs,
+        )
+        dist = distance_transform_edt(~water)
+        far = (dist > radius) & ~water
+        for a, b in zip(un, ma, strict=True):
+            d = load_gdal(a, masked=True).filled(np.nan) - load_gdal(
+                b, masked=True
+            ).filled(np.nan)
+            assert np.nanmax(np.abs(d[far])) == 0.0
+            # ...and it does something nearer the water
+            near = (dist <= radius) & ~water
+            assert np.nanmax(np.abs(d[near])) > 0
+
+    def test_wrong_grid_raises(self, tmp_path, slc_stack_files):
+        bad = tmp_path / "bad_grid.tif"
+        write_arr(arr=np.ones((30, 30), dtype="uint8"), output_name=bad, dtype="uint8")
+        with pytest.raises(ValueError, match="must be on the same grid"):
+            similarity.create_per_date_similarities(
+                slc_stack_files,
+                date_strs=[f.stem.split(".")[0] for f in slc_stack_files],
+                output_dir=tmp_path / "out",
+                search_radius=3,
+                num_threads=1,
+                add_overviews=False,
+                mask_file=bad,
             )

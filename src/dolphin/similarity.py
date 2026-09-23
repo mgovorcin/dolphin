@@ -396,6 +396,7 @@ def create_per_date_similarities(
     num_threads: int = 5,
     add_overviews: bool = True,
     reference_idx: int | None = None,
+    mask_file: PathOrStr | None = None,
 ) -> list[Path]:
     """Create one phase similarity raster per acquisition date.
 
@@ -432,6 +433,11 @@ def create_per_date_similarities(
         Its own raster would be the ordinary single-reference stack similarity
         rather than an epoch-specific measure, so it is not written. It is still
         used as a partner for the other dates, where it forms a valid interferogram.
+    mask_file : PathOrStr, optional
+        Water mask (0 = water, 1 = land, uint8) on the same grid as `slc_file_list`,
+        applied exactly as in `create_similarities`: masked pixels get no value and
+        are skipped as neighbors. Without it the per-date rasters would keep scoring
+        water that the ministack raster excludes.
 
     Returns
     -------
@@ -452,7 +458,12 @@ def create_per_date_similarities(
 
     """
     from dolphin._overviews import Resampling, create_image_overviews
-    from dolphin.io import BackgroundStackWriter, VRTStack, process_blocks
+    from dolphin.io import (
+        BackgroundStackWriter,
+        RasterReader,
+        VRTStack,
+        process_blocks,
+    )
 
     if len(date_strs) != len(slc_file_list):
         msg = f"Got {len(slc_file_list)} files but {len(date_strs)} dates"
@@ -477,17 +488,32 @@ def create_per_date_similarities(
         out = np.full((len(out_idxs), n_rows, n_cols), np.nan, dtype="float32")
         if np.sum(block) == 0 or np.isnan(block).all():
             return out, rows, cols
+        mask = None
+        if len(readers) > 1:
+            mask = np.asarray(readers[1][rows, cols]).astype(bool)
         for out_band, i in enumerate(out_idxs):
             others = [j for j in range(n_dates) if j != i]
             out[out_band] = median_similarity(
                 ifg_stack=block[[i]] * np.conj(block[others]),
                 search_radius=search_radius,
+                mask=mask,
             )
         return out, rows, cols
 
     reader = VRTStack(
         [Path(f) for f in slc_file_list], outfile=output_dir / "per_date_inputs.vrt"
     )
+    readers: list[Any] = [reader]
+    if mask_file is not None:
+        mask_reader = RasterReader.from_file(mask_file, keepdims=False)
+        if tuple(mask_reader.shape[-2:]) != tuple(reader.shape[-2:]):
+            msg = (
+                f"Mask {mask_file} has shape {tuple(mask_reader.shape[-2:])}, but the"
+                f" SLCs are {tuple(reader.shape[-2:])}. The mask must be on the same"
+                " grid; a strided workflow needs a decimated copy."
+            )
+            raise ValueError(msg)
+        readers.append(mask_reader)
     writer = BackgroundStackWriter(
         output_files,
         like_filename=slc_file_list[0],
@@ -496,7 +522,7 @@ def create_per_date_similarities(
         nodata=np.nan,
     )
     process_blocks(
-        [reader],
+        readers,
         writer,
         func=calc_per_date_sim,
         block_shape=block_shape,
