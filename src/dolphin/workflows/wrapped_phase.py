@@ -652,34 +652,47 @@ def compressed_reference_ifgs(
     secondary_dates: Sequence[datetime.datetime],
     single_ref_ifgs: Sequence[Path],
 ) -> list[Path]:
-    """The (reference epoch -> real date) ifgs a manual network needs.
+    """The one (reference epoch -> newest date) ifg a manual network needs.
 
     A manual-index network addresses the phase-linked (real-date) list only, so
-    the compressed SLC's reference epoch is never one of its nodes. That is fine
-    while the epoch lies before the window the indexes span. When it falls
-    inside -- e.g. it is the second-to-last date, which happens in forward mode
-    whenever the newest compressed SLC was written by the previous run -- the
-    interval from it to the next date has no interferogram at all, and the
-    inversion can only bridge it indirectly.
+    the compressed SLC's reference epoch is never one of its nodes. That matters
+    in exactly one case: when the epoch is the **second-to-last** date among all
+    the inputs, real and compressed. DISP-S1's forward mode re-references its
+    product to that date, so the product then reports an interval no
+    interferogram spans -- and its real image cannot stand in, because a real
+    SLC may not share the reference date. On F11116 those products came out at
+    36 / 9 / 10 % unconnected against ~2 % for every other dry-weather interval.
 
-    The pairs are already on disk: every phase-linked output is referenced to
-    the reference epoch, so ``single_ref_ifgs[i]`` *is* (reference ->
-    ``secondary_dates[i]``). This keeps the ones whose secondary falls inside
-    the window and after the reference. Only negative (count-from-the-end)
-    indexes are understood; anything else returns nothing rather than guessing
-    at what window was meant.
+    The pair is already on disk: every phase-linked output is referenced to the
+    reference epoch, so ``single_ref_ifgs[i]`` *is* (reference ->
+    ``secondary_dates[i]``). This keeps the one whose secondary is the newest
+    date. Only negative (count-from-the-end) indexes are understood; anything
+    else returns nothing rather than guessing at what network was meant.
+
+    Deliberately narrow. An earlier version kept every in-window pair after the
+    reference, on the reasoning that the epoch is independent of later dates and
+    the pairs cost nothing to keep. Measured on F11116, that made the runs it
+    was not written for *worse*: at three acquisitions past the reference it
+    added three edges to a ten-edge network and moved the product from 1.7 % to
+    2.5 % unconnected and 2.94 mm to 3.74 mm against historical, because those
+    long-baseline pairs into the compressed epoch carry lower coherence
+    (0.693 / 0.664 / 0.644 against 0.729 / 0.681 / 0.672 for the equivalent
+    real pairs) and pull the inversion toward the weaker observations. Where the
+    product's interval is already an ordinary real-to-real edge, the network
+    needs no help.
     """
     flat = [i for pair in indexes for i in pair]
     if not flat or any(i >= 0 for i in flat):
         return []
-    depth = max(abs(i) for i in flat)
     ref = _as_date(reference_date)
     dates = [_as_date(d) for d in secondary_dates]
-    window = sorted({*dates, ref})[-depth:]
-    if ref not in window:
+    all_dates = sorted({*dates, ref})
+    # Only when the reference is what the product will be referenced to.
+    if len(all_dates) < 2 or all_dates[-2] != ref:
         return []
+    newest = all_dates[-1]
     return [
         p
         for d, p in zip(dates, single_ref_ifgs, strict=True)
-        if d in window and d > ref
+        if d == newest
     ]
