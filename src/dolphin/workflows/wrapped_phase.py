@@ -692,7 +692,16 @@ def compressed_reference_ifgs(
     after = [d for d in dates if d > ref]
     # `len(after)` is the epoch's position: 1 means it is the second-to-last
     # date among all the inputs, which is the case the default exists for.
-    if not after or len(after) > depth:
+    # `depth == 0` means no limit: pair at every position. Every in-window date
+    # then has a direct edge to the epoch instead of reaching it through a
+    # chain of consecutive pairs, which is what stops one decorrelated scene
+    # propagating -- and wherever the epoch precedes the whole window it also
+    # becomes the earliest node, so the inversion anchors on it.
+    #
+    # Pairing only with dates AFTER the reference keeps this noise-safe at
+    # every position: a compressed SLC's members all fall at or before its
+    # reference, so none of these pairs shares noise with it.
+    if not after or (depth and len(after) > depth):
         return []
     # Never reach outside the window the indexes address: a node the network
     # cannot see would enter the inversion with only its own edges.

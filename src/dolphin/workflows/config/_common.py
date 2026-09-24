@@ -229,7 +229,7 @@ class InterferogramNetwork(BaseModel, extra="forbid"):
     )
     compressed_reference_depth: int = Field(
         1,
-        ge=1,
+        ge=0,
         description=(
             "How far back the compressed SLC's reference epoch may sit and still"
             " be paired, counted in real acquisitions after it. 1 -- the default"
@@ -239,7 +239,11 @@ class InterferogramNetwork(BaseModel, extra="forbid"):
             " shallower positions, adding one interferogram per acquisition. On"
             " F11116 that measured worse where the interval was already covered"
             " (1.7 -> 2.5 % unconnected at position 3), so raising this is a"
-            " trade-study knob, not a recommendation. Ignored unless"
+            " trade-study knob, not a recommendation. **0 means no limit**:"
+            " pair at every position, so every in-window date has a direct edge"
+            " to the epoch rather than reaching it through a chain -- and"
+            " wherever the epoch precedes the whole window it becomes the"
+            " earliest node, so the inversion anchors on it. Ignored unless"
             " `include_compressed_reference` is set."
         ),
     )

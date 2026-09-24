@@ -167,3 +167,28 @@ def test_a_bigger_depth_never_shrinks_the_result():
                                                _ifgs(ref, dates), depth=k))
                  for k in (1, 2, 3, 4, 5)]
         assert sizes == sorted(sizes), (position, sizes)
+
+
+@pytest.mark.parametrize("position", [1, 2, 3, 4, 5, 9])
+def test_depth_zero_pairs_at_every_position(position):
+    """The anchor arm: every in-window date after the epoch gets a direct edge,
+    whatever the epoch's position."""
+    all_dates = _dates(20)
+    ref = all_dates[-(position + 1)]
+    dates = [d for d in all_dates if d != ref]
+    got = compressed_reference_ifgs(NEAREST_4, ref, dates, _ifgs(ref, dates), depth=0)
+    window = sorted({*dates, ref})[-5:]
+    assert got == _ifgs(ref, [d for d in window if d > ref])
+    assert got, "depth 0 must never return nothing when the epoch is in reach"
+
+
+def test_depth_zero_makes_the_epoch_the_earliest_node_once_it_precedes_the_window():
+    """Where that holds, `get_incidence_matrix` anchors the inversion on the
+    epoch without anything else being asked of it."""
+    all_dates = _dates(20)
+    ref = all_dates[-6]                      # position 5: precedes the window
+    dates = [d for d in all_dates if d != ref]
+    got = compressed_reference_ifgs(NEAREST_4, ref, dates, _ifgs(ref, dates), depth=0)
+    window = sorted({*dates, ref})[-5:]
+    assert len(got) == len(window) - (1 if ref in window else 0)
+    assert all(ref < d for d in window if d != ref)
