@@ -117,3 +117,53 @@ def test_create_ifgs_keeps_the_reference_ifg_only_when_asked(tmp_path, include):
 
 def test_the_default_leaves_existing_networks_alone():
     assert InterferogramNetwork(indexes=NEAREST_4).include_compressed_reference is False
+
+
+# --- the depth knob, for the trade study ----------------------------------
+#
+# depth=1 is the default and the recommendation; larger values exist so the
+# "pair at shallower positions too" arm can be measured against it with one
+# parameter between the two runs rather than two code paths.
+
+
+@pytest.mark.parametrize("position", [1, 2, 3, 4, 5])
+def test_depth_one_pairs_only_at_position_one(position):
+    all_dates = _dates(15)
+    ref = all_dates[-(position + 1)]
+    dates = [d for d in all_dates if d != ref]
+    got = compressed_reference_ifgs(NEAREST_4, ref, dates, _ifgs(ref, dates))
+    assert len(got) == (1 if position == 1 else 0)
+
+
+@pytest.mark.parametrize("position", [1, 2, 3, 4])
+def test_depth_five_pairs_one_per_acquisition_after_the_reference(position):
+    """Positions 1-4: the epoch is inside the nearest-4 window, so every date
+    after it is a node the pair can reach."""
+    all_dates = _dates(15)
+    ref = all_dates[-(position + 1)]
+    dates = [d for d in all_dates if d != ref]
+    got = compressed_reference_ifgs(NEAREST_4, ref, dates, _ifgs(ref, dates), depth=5)
+    assert got == _ifgs(ref, all_dates[-position:])
+
+
+def test_depth_never_reaches_outside_the_index_window():
+    """At position 5 the epoch is one step beyond what nearest-4 addresses.
+    Raising the depth must not invent a node the network cannot see."""
+    all_dates = _dates(15)
+    ref = all_dates[-6]
+    dates = [d for d in all_dates if d != ref]
+    got = compressed_reference_ifgs(NEAREST_4, ref, dates, _ifgs(ref, dates), depth=5)
+    window = sorted({*dates, ref})[-5:]
+    assert all(_ifgs(ref, [d])[0] in got for d in window if d > ref)
+    assert len(got) == len([d for d in window if d > ref])
+
+
+def test_a_bigger_depth_never_shrinks_the_result():
+    all_dates = _dates(15)
+    for position in range(1, 5):
+        ref = all_dates[-(position + 1)]
+        dates = [d for d in all_dates if d != ref]
+        sizes = [len(compressed_reference_ifgs(NEAREST_4, ref, dates,
+                                               _ifgs(ref, dates), depth=k))
+                 for k in (1, 2, 3, 4, 5)]
+        assert sizes == sorted(sizes), (position, sizes)

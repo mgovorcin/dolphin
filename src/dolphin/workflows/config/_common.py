@@ -222,10 +222,25 @@ class InterferogramNetwork(BaseModel, extra="forbid"):
         description=(
             "With a manual-index network and compressed SLC inputs: also keep the"
             " interferograms from the compressed SLC's reference epoch to the real"
-            " dates after it, whenever that epoch falls inside the window the"
-            " indexes span. Without this the manual network is real-dates only, so"
-            " when the reference epoch is the second-to-last date no interferogram"
-            " spans the last interval."
+            " dates after it. Without this the manual network is real-dates only,"
+            " so when the reference epoch is the second-to-last date no"
+            " interferogram spans the interval the product reports."
+        ),
+    )
+    compressed_reference_depth: int = Field(
+        1,
+        ge=1,
+        description=(
+            "How far back the compressed SLC's reference epoch may sit and still"
+            " be paired, counted in real acquisitions after it. 1 -- the default"
+            " -- keeps the pair only when the epoch is the second-to-last date"
+            " among all inputs, which is the one case where the product's own"
+            " interval has no interferogram. Larger values also pair it at"
+            " shallower positions, adding one interferogram per acquisition. On"
+            " F11116 that measured worse where the interval was already covered"
+            " (1.7 -> 2.5 % unconnected at position 3), so raising this is a"
+            " trade-study knob, not a recommendation. Ignored unless"
+            " `include_compressed_reference` is set."
         ),
     )
 

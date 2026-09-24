@@ -513,6 +513,7 @@ def create_ifgs(
                     reference_date,
                     secondary_dates,
                     single_ref_ifgs,
+                    depth=interferogram_network.compressed_reference_depth,
                 )
             )
 
@@ -651,6 +652,7 @@ def compressed_reference_ifgs(
     reference_date: datetime.datetime,
     secondary_dates: Sequence[datetime.datetime],
     single_ref_ifgs: Sequence[Path],
+    depth: int = 1,
 ) -> list[Path]:
     """The one (reference epoch -> newest date) ifg a manual network needs.
 
@@ -684,15 +686,19 @@ def compressed_reference_ifgs(
     flat = [i for pair in indexes for i in pair]
     if not flat or any(i >= 0 for i in flat):
         return []
+    span = max(abs(i) for i in flat)
     ref = _as_date(reference_date)
     dates = [_as_date(d) for d in secondary_dates]
-    all_dates = sorted({*dates, ref})
-    # Only when the reference is what the product will be referenced to.
-    if len(all_dates) < 2 or all_dates[-2] != ref:
+    after = [d for d in dates if d > ref]
+    # `len(after)` is the epoch's position: 1 means it is the second-to-last
+    # date among all the inputs, which is the case the default exists for.
+    if not after or len(after) > depth:
         return []
-    newest = all_dates[-1]
+    # Never reach outside the window the indexes address: a node the network
+    # cannot see would enter the inversion with only its own edges.
+    window = sorted({*dates, ref})[-span:]
     return [
         p
         for d, p in zip(dates, single_ref_ifgs, strict=True)
-        if d == newest
+        if d > ref and d in window
     ]
