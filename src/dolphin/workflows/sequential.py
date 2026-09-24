@@ -19,6 +19,7 @@ from dolphin._types import Filename
 from dolphin.io import VRTStack
 from dolphin.similarity import create_similarities
 from dolphin.stack import CompressedSlcPlan, MiniStackPlanner
+from dolphin.stitching import _get_matching_raster
 
 from .config import ShpMethod
 from .single import run_wrapped_phase_single
@@ -217,6 +218,18 @@ def run_wrapped_phase_sequential(
             nearest_n=similarity_nearest_n,
             num_threads=2,
             add_overviews=False,
+            # This raster is what ships when a run spans several ministacks, so it
+            # takes the same water mask as the per-ministack ones; without it the
+            # shipped layer would be the only one still scoring water.
+            mask_file=(
+                _get_matching_raster(
+                    input_file=Path(similarity_mask_file),
+                    output_dir=output_folder,
+                    match_file=cur_output_files[0],
+                )
+                if similarity_mask_file is not None
+                else None
+            ),
         )
         similarity_files.append(full_similarity_file)
 

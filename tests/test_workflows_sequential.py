@@ -1,7 +1,8 @@
+import numpy as np
 import pytest
 
 # from dolphin._types import HalfWindow, Strides
-from dolphin.io import _readers
+from dolphin.io import _readers, write_arr
 from dolphin.phase_link import simulate
 from dolphin.utils import compute_out_shape, gpu_is_available
 from dolphin.workflows import sequential
@@ -142,3 +143,59 @@ def test_per_date_similarity_across_ministacks(tmp_path, slc_file_list):
     names = [p.name for p in per_date]
     assert len(names) == len(set(names))
     assert not list(output_folder.glob("per_date_similarity"))
+
+
+def test_full_stack_similarity_gets_the_water_mask(
+    tmp_path, slc_file_list, monkeypatch
+):
+    """The multi-ministack raster takes the same water mask as the per-ministack ones.
+
+    It is written only when a run spans several ministacks, and it is the one that
+    ships (`stitched_similarity_files[-1]`). Left unmasked it would be the only
+    similarity layer still scoring open water, which is exactly the layer a product
+    would carry.
+    """
+    from dolphin import similarity
+
+    vrt_stack = _readers.VRTStack(slc_file_list, outfile=tmp_path / "slc_stack.vrt")
+    n_slc, rows, cols = vrt_stack.shape
+    ms_size = 5
+    assert n_slc > ms_size, "need more than one ministack for this test"
+
+    mask_file = tmp_path / "water.tif"
+    write_arr(
+        arr=np.ones((rows, cols), dtype="uint8"),
+        output_name=mask_file,
+        like_filename=slc_file_list[0],
+        dtype="uint8",
+    )
+
+    seen: list[object] = []
+    real = similarity.create_similarities
+
+    def spy(*args, **kwargs):
+        seen.append(kwargs.get("mask_file"))
+        return real(*args, **kwargs)
+
+    # `sequential` imported the name directly, so patch it there as well
+    monkeypatch.setattr(similarity, "create_similarities", spy)
+    monkeypatch.setattr(sequential, "create_similarities", spy)
+
+    sequential.run_wrapped_phase_sequential(
+        slc_vrt_stack=vrt_stack,
+        output_folder=tmp_path / "sequential",
+        ministack_size=ms_size,
+        half_window={"x": cols // 2, "y": rows // 2},
+        strides={"x": 1, "y": 1},
+        ps_mask_file=None,
+        amp_mean_file=None,
+        amp_dispersion_file=None,
+        shp_method="rect",
+        shp_alpha=None,
+        shp_nslc=None,
+        similarity_mask_file=mask_file,
+    )
+
+    # One call per ministack, plus the full-stack one
+    assert len(seen) > 2
+    assert all(m is not None for m in seen), seen
