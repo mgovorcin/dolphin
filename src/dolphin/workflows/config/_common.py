@@ -203,11 +203,18 @@ class InterferogramNetwork(BaseModel, extra="forbid"):
         False,
         description=(
             "With a manual-index network and compressed SLC inputs: also keep the"
-            " interferograms from the compressed SLC's reference epoch to the real"
-            " dates after it, whenever that epoch falls inside the window the"
-            " indexes span. Without this the manual network is real-dates only, so"
-            " when the reference epoch is the second-to-last date no interferogram"
-            " spans the last interval."
+            " one interferogram from the compressed SLC's reference epoch to the"
+            " newest date, in the single case where that epoch is the"
+            " second-to-last date among all the inputs. A manual network"
+            " addresses the real dates only, so in that case the interval the"
+            " product reports has no interferogram spanning it, and the real"
+            " image for the epoch cannot stand in -- a real SLC may not share"
+            " the reference date.\n\n"
+            "Only that case. Keeping the pairs at shallower positions too was"
+            " measured and was worse wherever the product's interval is already"
+            " an ordinary real-to-real edge: those pairs reach back into the"
+            " compressed epoch and are the least coherent observations in the"
+            " network."
         ),
     )
 
