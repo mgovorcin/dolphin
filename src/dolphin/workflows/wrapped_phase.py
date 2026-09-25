@@ -514,6 +514,7 @@ def create_ifgs(
                     secondary_dates,
                     single_ref_ifgs,
                     depth=interferogram_network.compressed_reference_depth,
+                    anchor=interferogram_network.compressed_reference_anchor,
                 )
             )
 
@@ -653,6 +654,7 @@ def compressed_reference_ifgs(
     secondary_dates: Sequence[datetime.datetime],
     single_ref_ifgs: Sequence[Path],
     depth: int = 1,
+    anchor: bool = False,
 ) -> list[Path]:
     """The one (reference epoch -> newest date) ifg a manual network needs.
 
@@ -701,7 +703,20 @@ def compressed_reference_ifgs(
     # Pairing only with dates AFTER the reference keeps this noise-safe at
     # every position: a compressed SLC's members all fall at or before its
     # reference, so none of these pairs shares noise with it.
-    if not after or (depth and len(after) > depth):
+    if not after:
+        return []
+    if anchor:
+        # One edge, the shortest baseline the epoch has: to the earliest
+        # in-window date after it. Enough to make the epoch a node of the
+        # unwrapped network, which is all a reference reset needs.
+        span_ = max(abs(i) for i in flat)
+        win = sorted({*dates, ref})[-span_:]
+        later = [d for d in after if d in win]
+        if not later:
+            return []
+        first = min(later)
+        return [p for d, p in zip(dates, single_ref_ifgs, strict=True) if d == first]
+    if depth and len(after) > depth:
         return []
     # Never reach outside the window the indexes address: a node the network
     # cannot see would enter the inversion with only its own edges.

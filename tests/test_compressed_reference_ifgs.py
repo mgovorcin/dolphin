@@ -192,3 +192,35 @@ def test_depth_zero_makes_the_epoch_the_earliest_node_once_it_precedes_the_windo
     window = sorted({*dates, ref})[-5:]
     assert len(got) == len(window) - (1 if ref in window else 0)
     assert all(ref < d for d in window if d != ref)
+
+
+# --- minimal anchor: one edge, always -------------------------------------
+
+
+@pytest.mark.parametrize("position", [1, 2, 3, 5, 9])
+def test_anchor_keeps_exactly_one_edge_at_every_position(position):
+    all_dates = _dates(20)
+    ref = all_dates[-(position + 1)]
+    dates = [d for d in all_dates if d != ref]
+    got = compressed_reference_ifgs(NEAREST_4, ref, dates, _ifgs(ref, dates), anchor=True)
+    assert len(got) == 1, (position, got)
+
+
+def test_anchor_picks_the_shortest_baseline_pair():
+    """The epoch's most coherent pair is to the earliest in-window date after
+    it; pairing to the newest would be the longest baseline available."""
+    all_dates = _dates(20)
+    ref = all_dates[-6]                       # position 5
+    dates = [d for d in all_dates if d != ref]
+    got = compressed_reference_ifgs(NEAREST_4, ref, dates, _ifgs(ref, dates), anchor=True)
+    window = sorted({*dates, ref})[-5:]
+    assert got == _ifgs(ref, [min(d for d in window if d > ref)])
+
+
+def test_anchor_overrides_depth():
+    all_dates = _dates(20)
+    ref = all_dates[-4]                       # position 3: depth 1 would add nothing
+    dates = [d for d in all_dates if d != ref]
+    assert compressed_reference_ifgs(NEAREST_4, ref, dates, _ifgs(ref, dates), depth=1) == []
+    assert len(compressed_reference_ifgs(NEAREST_4, ref, dates, _ifgs(ref, dates),
+                                         depth=1, anchor=True)) == 1
